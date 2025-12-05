@@ -31,7 +31,7 @@ public class dataCollectorAgent {
             // Condense each article to a short string
             return newsList.stream()
                     .map(article -> article.get("headline") + " (" + article.get("source") + ")")
-                    .limit(15)
+                    .limit(75)
                     .collect(Collectors.toList());
 
         } catch (Exception e) {

@@ -4,9 +4,10 @@ import com.postfolio.postfolio.longTermHoldingInvestmentAgents.manager;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
 
 @RestController
-@RequestMapping("/llm")
+@RequestMapping("/trade")
 public class longTermStockController {
     private final manager manage;
 
@@ -14,11 +15,10 @@ public class longTermStockController {
         this.manage = manage;
     }
 
-    // GET http://localhost:8080/llm/health/tip
-    @GetMapping("/stock/longterm/")
-    public String healthTipGeneration() {
+    // GET http://localhost:8080/trade/stock/llm/
+    @GetMapping("/stock/llm/")
+    public List<String> healthTipGeneration() {
         System.out.println("Initializing Agents!");
-        System.out.println(manage.deployAgents());
         return manage.deployAgents();
     }
 }
