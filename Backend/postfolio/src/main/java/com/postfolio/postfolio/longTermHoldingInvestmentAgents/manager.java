@@ -1,4 +1,4 @@
-package com.postfolio.postfolio.investmentAgents;
+package com.postfolio.postfolio.longTermHoldingInvestmentAgents;
 
 public class manager {
     public void deployAgents() {

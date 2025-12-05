@@ -1,11 +1,11 @@
-package com.postfolio.postfolio.investmentAgents;
+package com.postfolio.postfolio.longTermHoldingInvestmentAgents;
 
 import org.springframework.web.client.RestTemplate;
 import tools.jackson.databind.ObjectMapper;
-
 import java.util.List;
 import java.util.Map;
 
+// Takes information from analyzer and dataCollector and makes final decision utilizing Ollama
 public class sentimentAnalyzerAgent {
     private final String OLLAMA_URL = "http://localhost:11434/api/generate";
     private final RestTemplate restTemplate = new RestTemplate();
