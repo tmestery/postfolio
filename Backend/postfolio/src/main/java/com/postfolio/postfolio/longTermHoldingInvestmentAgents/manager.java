@@ -12,9 +12,8 @@ public class manager {
 
     public List<String> deployAgents() {
         // Set up agent objects
-        dataCollectorAgent dataAgent = new dataCollectorAgent();
-        analyzerAgent analyzeAgent = new analyzerAgent();
-        sentimentAnalyzerAgent sentimentAnalyzeAgent = new sentimentAnalyzerAgent();
+        dataCollection dataAgent = new dataCollection();
+        dataAnalyzerAgent sentimentAnalyzeAgent = new dataAnalyzerAgent();
 
         while (allowance >= 0) {
             // Collect lists from agents

@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class dataCollectorAgent {
+public class dataCollection {
 
     private final String apiKey = System.getenv("FINNHUB_API_KEY");
     private final RestTemplate restTemplate = new RestTemplate();

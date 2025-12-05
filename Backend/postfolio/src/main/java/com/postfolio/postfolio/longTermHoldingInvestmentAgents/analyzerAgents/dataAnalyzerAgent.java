@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class sentimentAnalyzerAgent {
+public class dataAnalyzerAgent {
     private final String OLLAMA_URL = "http://localhost:11434/api/generate";
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
