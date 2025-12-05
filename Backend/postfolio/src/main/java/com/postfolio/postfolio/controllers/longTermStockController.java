@@ -1,6 +1,6 @@
 package com.postfolio.postfolio.controllers;
 
-import com.postfolio.postfolio.longTermHoldingInvestmentAgents.manager;
+import com.postfolio.postfolio.stockInvestmentAgents.manager;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

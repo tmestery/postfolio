@@ -1,4 +1,4 @@
-package com.postfolio.postfolio.longTermHoldingInvestmentAgents;
+package com.postfolio.postfolio.stockInvestmentAgents;
 
 import org.springframework.stereotype.Service;
 import java.util.List;
