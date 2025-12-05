@@ -11,28 +11,35 @@ public class manager {
     private List<String> stockList = new ArrayList<>();
 
     public List<String> deployAgents() {
-        while (allowance >= 0) {
-            // Set up agent objects
-            dataCollectorAgent dataAgent = new dataCollectorAgent();
-            analyzerAgent analyzeAgent = new analyzerAgent();
-            sentimentAnalyzerAgent sentimentAnalyzeAgent = new sentimentAnalyzerAgent();
+        // Set up agent objects
+        dataCollectorAgent dataAgent = new dataCollectorAgent();
+        analyzerAgent analyzeAgent = new analyzerAgent();
+        sentimentAnalyzerAgent sentimentAnalyzeAgent = new sentimentAnalyzerAgent();
 
+        while (allowance >= 0) {
             // Collect lists from agents
-            List<String> marketNewsList = dataAgent.fetchGeneralMarketNews();
-            if (marketNewsList != null) {
-                for (String news : marketNewsList) {
-                    System.out.println(news);
+            // NOW returns List<List<String>>
+            List<List<String>> marketNewsGrouped = dataAgent.fetchGeneralMarketNews();
+
+            for (int i = 0; i < marketNewsGrouped.size(); i++) {
+
+                List<String> chunk = marketNewsGrouped.get(i);   // List<String>
+
+                // Run sentiment on ONE chunk (25 headlines)
+                String bestStockOption = sentimentAnalyzeAgent.sentimentAnalyzer(
+                        chunk,
+                        chunk.size(),
+                        stockList // pass previously chosen tickers
+                );
+
+                // Add to stockList if its not already on the list
+                if (!stockList.contains(bestStockOption)) {
+                    stockList.add(bestStockOption);
                 }
 
-                // Analyze all the data collected with Ollama
-                String bestStockOptionname = sentimentAnalyzeAgent.sentimentAnalyzer(marketNewsList);
-
-                // Add to stockList
-                stockList.add(bestStockOptionname);
+                // Update allowance with agent advice
+                allowance -= 250;
             }
-
-            // Update allowance
-            allowance -= 500;
         }
 
         return stockList;

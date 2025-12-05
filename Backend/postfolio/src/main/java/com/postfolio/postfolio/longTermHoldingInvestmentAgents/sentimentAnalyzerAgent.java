@@ -13,12 +13,11 @@ public class sentimentAnalyzerAgent {
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public String sentimentAnalyzer(List<String> marketNewsList) {
+    public String sentimentAnalyzer(List<String> marketNewsList, int num, List<String> tickerList) {
         try {
             // Convert news list to JSON string
             String newsJson = objectMapper.writeValueAsString(marketNewsList);
 
-            // Build the prompt dynamically
             // Build the prompt dynamically for predicting top stock
             String prompt = "You are a financial data assistant. I will give you a list of news headlines.\n\n" +
                     "Your task:\n" +
@@ -30,11 +29,7 @@ public class sentimentAnalyzerAgent {
                     "Use the data from the following headlines to make your prediction:\n" + newsJson;
 
             // Build request body for Ollama
-            Map<String, Object> requestBody = Map.of(
-                    "model", "llama3",
-                    "stream", false,
-                    "prompt", prompt
-            );
+            Map<String, Object> requestBody = Map.of("model", "llama3", "stream", false, "prompt", prompt);
 
             // Send POST request
             String responseString = restTemplate.postForObject(OLLAMA_URL, requestBody, String.class);
