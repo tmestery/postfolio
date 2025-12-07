@@ -2,9 +2,9 @@ package com.postfolio.postfolio.stockInvestmentAgents;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Map;
+import java.util.HashMap;
 import org.springframework.stereotype.Service;
-
 import com.postfolio.postfolio.stockInvestmentAgents.analyzerAgents.costAnalysisAgent;
 import com.postfolio.postfolio.stockInvestmentAgents.analyzerAgents.dataAnalyzerAgent;
 
@@ -14,7 +14,7 @@ public class manager {
     private List<String> stockList = new ArrayList<>();
     private List<Double> stockSharesAmount = new ArrayList<>();
 
-    public List<String> deployAgents() {
+    public Map<String, Double> deployAgents() {
         // Set up agent objects
         dataCollection dataAgent = new dataCollection();
         dataAnalyzerAgent sentimentAnalyzeAgent = new dataAnalyzerAgent();
@@ -49,6 +49,12 @@ public class manager {
             }
         }
 
-        return stockList;
+        Map<String, Double> result = new HashMap<>();
+
+        for (int i = 0; i < stockList.size(); i++) {
+            result.put(stockList.get(i), stockSharesAmount.get(i));
+        }
+
+        return result;
     }
 }
