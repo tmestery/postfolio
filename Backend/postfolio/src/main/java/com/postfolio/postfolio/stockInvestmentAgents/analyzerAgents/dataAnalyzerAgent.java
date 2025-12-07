@@ -1,11 +1,12 @@
-package com.postfolio.postfolio.stockInvestmentAgents;
+package com.postfolio.postfolio.stockInvestmentAgents.analyzerAgents;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.type.TypeReference;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class dataAnalyzerAgent {

@@ -1,4 +1,4 @@
-package com.postfolio.postfolio.stockInvestmentAgents;
+package com.postfolio.postfolio.stockInvestmentAgents.decisionAgents;
 
 public class safeDecisionAgent {
 

@@ -1,34 +1,38 @@
 package com.postfolio.postfolio.stockInvestmentAgents;
 
-import org.springframework.stereotype.Service;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.postfolio.postfolio.stockInvestmentAgents.analyzerAgents.costAnalysisAgent;
+import com.postfolio.postfolio.stockInvestmentAgents.analyzerAgents.dataAnalyzerAgent;
 
 @Service
 public class manager {
-    private int allowance = 1000;
+    private double allowance = 1000;
     private List<String> stockList = new ArrayList<>();
+    private List<Double> stockSharesAmount = new ArrayList<>();
 
     public List<String> deployAgents() {
         // Set up agent objects
         dataCollection dataAgent = new dataCollection();
         dataAnalyzerAgent sentimentAnalyzeAgent = new dataAnalyzerAgent();
+        costAnalysisAgent costAnalyzeAgent = new costAnalysisAgent();
 
         while (allowance >= 0) {
             // Collect lists from agents
-            // NOW returns List<List<String>>
             List<List<String>> marketNewsGrouped = dataAgent.fetchGeneralMarketNews();
 
             for (int i = 0; i < marketNewsGrouped.size(); i++) {
 
-                List<String> chunk = marketNewsGrouped.get(i);   // List<String>
+                List<String> chunk = marketNewsGrouped.get(i);
 
-                // Run sentiment on ONE chunk (25 headlines)
+                // Run analyzer on 25 headlines at a time
                 String bestStockOption = sentimentAnalyzeAgent.sentimentAnalyzer(
                         chunk,
                         chunk.size(),
-                        stockList // pass previously chosen tickers
+                        stockList // pass already chosen ticker symbols
                 );
 
                 // Add to stockList if its not already on the list
@@ -36,8 +40,12 @@ public class manager {
                     stockList.add(bestStockOption);
                 }
 
+                // Investment Shares Cost:
+                stockSharesAmount.add(costAnalyzeAgent.determineNumShares(bestStockOption, allowance));
+                System.out.println(costAnalyzeAgent.determineNumShares(bestStockOption, allowance));
+
                 // Update allowance with agent advice
-                allowance -= 250;
+                allowance = costAnalyzeAgent.updateAllowance(allowance);
             }
         }
 
