@@ -1,4 +1,4 @@
-package com.postfolio.postfolio.stockInvestmentAgents;
+package com.postfolio.postfolio.stockInvestmentAgents.managerAgents;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;

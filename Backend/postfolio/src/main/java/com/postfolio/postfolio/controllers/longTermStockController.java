@@ -1,7 +1,7 @@
 package com.postfolio.postfolio.controllers;
 
-import com.postfolio.postfolio.stockInvestmentAgents.manager;
-import com.postfolio.postfolio.stockInvestmentAgents.executeAgent;
+import com.postfolio.postfolio.stockInvestmentAgents.managerAgents.manager;
+import com.postfolio.postfolio.stockInvestmentAgents.managerAgents.executeAgent;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

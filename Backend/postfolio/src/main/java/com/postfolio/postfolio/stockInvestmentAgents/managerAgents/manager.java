@@ -1,4 +1,4 @@
-package com.postfolio.postfolio.stockInvestmentAgents;
+package com.postfolio.postfolio.stockInvestmentAgents.managerAgents;
 
 import java.util.ArrayList;
 import java.util.List;

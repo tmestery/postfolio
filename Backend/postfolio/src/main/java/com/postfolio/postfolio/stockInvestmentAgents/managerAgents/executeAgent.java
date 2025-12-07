@@ -1,4 +1,4 @@
-package com.postfolio.postfolio.stockInvestmentAgents;
+package com.postfolio.postfolio.stockInvestmentAgents.managerAgents;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
