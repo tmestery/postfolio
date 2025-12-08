@@ -7,6 +7,7 @@ import jakarta.persistence.SequenceGenerator;
 import lombok.Getter;
 import jakarta.persistence.Id;
 import lombok.Setter;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -20,6 +21,9 @@ public class WebUser {
     private String username;
     private String email;
     private String password;
+    private String firstName;
+    private String lastName;
+    private LocalDate dateOfBirth; // (yyyy-MM-dd)
 
     public Long getId() {
         return id;
@@ -27,6 +31,22 @@ public class WebUser {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     public String getUsername() {
@@ -43,5 +63,13 @@ public class WebUser {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 }
