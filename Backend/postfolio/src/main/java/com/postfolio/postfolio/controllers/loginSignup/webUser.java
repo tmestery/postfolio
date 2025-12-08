@@ -1,7 +1,7 @@
 package com.postfolio.postfolio.controllers.loginSignup;
 
-import com.postfolio.postfolio.models.UserRepository;
-import com.postfolio.postfolio.models.WebUser;
+import com.postfolio.postfolio.models.user.UserRepository;
+import com.postfolio.postfolio.models.user.WebUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.http.HttpStatus;

@@ -1,6 +1,5 @@
-package com.postfolio.postfolio.models;
+package com.postfolio.postfolio.models.user;
 
-import com.postfolio.postfolio.models.WebUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

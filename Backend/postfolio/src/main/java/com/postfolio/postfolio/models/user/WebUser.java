@@ -1,4 +1,4 @@
-package com.postfolio.postfolio.models;
+package com.postfolio.postfolio.models.user;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,7 +13,6 @@ import java.time.LocalDate;
 @Setter
 @Entity
 public class WebUser {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "web_user_seq_gen")
     @SequenceGenerator(name = "web_user_seq_gen", sequenceName = "web_user_seq", allocationSize = 1)
