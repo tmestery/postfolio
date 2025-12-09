@@ -63,7 +63,7 @@ public class postController {
     /**
      * POST http://localhost:8080/post/stock/
      *
-     * @return a success or failure code (***feature not specific to user currently)
+     * @return a success or failure code
      */
     @PostMapping("/stock/")
     @ResponseBody
@@ -74,6 +74,9 @@ public class postController {
         return new ResponseEntity<>(post, HttpStatus.CREATED);
     }
 
+    /**
+     * JUST FOR TESTING PURPOSES!!!
+     */
     @PostMapping("/stock/test/")
     public ResponseEntity<Post> createStockPostTest(@RequestBody StockPostRequest request) {
         WebUser user = userRepository.findById(1L).orElseThrow(); // fetch user manually
