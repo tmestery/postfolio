@@ -4,10 +4,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.SequenceGenerator;
+import com.postfolio.postfolio.models.user.WebUser;
 import lombok.Getter;
 import jakarta.persistence.Id;
 import lombok.Setter;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import jakarta.persistence.ManyToOne;
 
 @Getter
 @Setter
@@ -18,14 +21,21 @@ public class Post {
     @SequenceGenerator(name = "post_seq", sequenceName = "post_seq", allocationSize = 1)
     private Long id;
     private LocalDate dateInvested;
-    private LocalDate datePosted;
+    private LocalDateTime datePosted = LocalDateTime.now();
     private String stock;
     private double shares;
     private double pricePerShare;
     private double investedAmount;
 
+    @ManyToOne(optional = false)
+    private WebUser user;
+
     public LocalDate getDateInvested() {
         return dateInvested;
+    }
+
+    public void setCreatedAt(LocalDateTime datePosted) {
+        this.datePosted = datePosted;
     }
 
     public void setDateInvested(LocalDate dateInvested) {
@@ -44,7 +54,7 @@ public class Post {
         return pricePerShare;
     }
 
-    public void setPricePerShare() {
+    public void setPricePerShare(double pricePerShare) {
         this.pricePerShare = pricePerShare;
     }
 
@@ -56,19 +66,11 @@ public class Post {
        this.shares = shares;
    }
 
-    public String getStockName() {
+    public String getStock() {
         return stock;
     }
 
-    public void setStockName(String stock) {
+    public void setStock(String stock) {
         this.stock = stock;
-    }
-
-    public LocalDate getDatePosted() {
-        return datePosted;
-    }
-
-    public void setDatePosted(LocalDate datePosted) {
-        this.datePosted = datePosted;
     }
 }

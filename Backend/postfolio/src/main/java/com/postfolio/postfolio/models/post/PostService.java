@@ -1,15 +1,14 @@
-package com.postfolio.postfolio.models;
+package com.postfolio.postfolio.models.post;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import com.postfolio.postfolio.models.post.PostRepository;
 import com.postfolio.postfolio.models.post.Post;
+import com.postfolio.postfolio.models.user.WebUser;
 import java.util.Optional;
 import java.util.List;
+import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Service
 public class PostService {
@@ -22,5 +21,20 @@ public class PostService {
 
     public List<Post> getPostsByStock(String stock) {
         return repository.findAllByStock(stock);
+    }
+
+    public Post createPost(WebUser user, LocalDate dateInvested, String stock, double shares, double investedAmount) {
+        Post post = new Post();
+        post.setUser(user);
+        post.setDateInvested(dateInvested);
+        post.setStock(stock);
+        post.setShares(shares);
+        post.setInvestedAmount(investedAmount);
+        post.setCreatedAt(LocalDateTime.now());
+        return repository.save(post);
+    }
+
+    public List<Post> getFeed() {
+        return repository.findAllByOrderByDatePostedDesc();
     }
 }
