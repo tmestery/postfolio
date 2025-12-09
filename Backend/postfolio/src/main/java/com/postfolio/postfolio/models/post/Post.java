@@ -11,13 +11,16 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 
 @Getter
 @Setter
 @Entity
 public class Post {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "post_seq_gen")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "post_seq")
     @SequenceGenerator(name = "post_seq", sequenceName = "post_seq", allocationSize = 1)
     private Long id;
     private LocalDate dateInvested;
@@ -28,6 +31,8 @@ public class Post {
     private double investedAmount;
 
     @ManyToOne(optional = false)
+    @JsonIgnoreProperties({"password", "dateOfBirth", "firstName", "lastName", "email"})
+    @JoinColumn(name = "user_id")
     private WebUser user;
 
     public LocalDate getDateInvested() {
@@ -58,13 +63,13 @@ public class Post {
         this.pricePerShare = pricePerShare;
     }
 
-   public double getShares() {
-       return shares;
-   }
+    public double getShares() {
+        return shares;
+    }
 
-   public void setShares(double shares) {
-       this.shares = shares;
-   }
+    public void setShares(double shares) {
+        this.shares = shares;
+    }
 
     public String getStock() {
         return stock;

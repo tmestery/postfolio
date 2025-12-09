@@ -23,14 +23,14 @@ public class PostService {
         return repository.findAllByStock(stock);
     }
 
-    public Post createPost(WebUser user, LocalDate dateInvested, String stock, double shares, double investedAmount) {
+    public Post createPost(WebUser user, LocalDate dateInvested, String stock, Double shares, Double investedAmount) {
         Post post = new Post();
         post.setUser(user);
         post.setDateInvested(dateInvested);
+        post.setCreatedAt(LocalDateTime.now());
         post.setStock(stock);
         post.setShares(shares);
         post.setInvestedAmount(investedAmount);
-        post.setCreatedAt(LocalDateTime.now());
         return repository.save(post);
     }
 
