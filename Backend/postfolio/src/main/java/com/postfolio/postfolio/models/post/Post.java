@@ -1,4 +1,4 @@
-package com.postfolio.postfolio.models;
+package com.postfolio.postfolio.models.post;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,11 +17,20 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "post_seq_gen")
     @SequenceGenerator(name = "post_seq", sequenceName = "post_seq", allocationSize = 1)
     private Long id;
+    private LocalDate dateInvested;
     private LocalDate datePosted;
     private String stockName;
     private double shares;
     private double pricePerShare;
     private double investedAmount;
+
+    public LocalDate getDateInvested() {
+        return dateInvested;
+    }
+
+    public void setDateInvested(LocalDate dateInvested) {
+        this.dateInvested = dateInvested;
+    }
 
     public double getInvestedAmount() {
         return investedAmount;

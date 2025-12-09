@@ -18,7 +18,12 @@ public class webUser {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // POST http://localhost:8080/credentials/signup
+    /**
+     * POST http://localhost:8080/credentials/signup
+     *
+     * @param user
+     * @return if the user was able to be saved to DB
+     */
     @PostMapping(value = "/signup/", consumes = "application/json")
     public WebUser createUser(@RequestBody WebUser user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -26,7 +31,12 @@ public class webUser {
         return userRepository.save(user);
     }
 
-    // POST http://localhost:8080/credentials/login/
+    /**
+     * POST http://localhost:8080/credentials/login/
+     *
+     * @param user
+     * @return a good status code if user found, bad if not
+     */
     @PostMapping("/login/")
     @ResponseBody
     public ResponseEntity login(@RequestBody WebUser user) {
