@@ -19,7 +19,7 @@ public class Post {
     private Long id;
     private LocalDate dateInvested;
     private LocalDate datePosted;
-    private String stockName;
+    private String stock;
     private double shares;
     private double pricePerShare;
     private double investedAmount;
@@ -57,11 +57,11 @@ public class Post {
    }
 
     public String getStockName() {
-        return stockName;
+        return stock;
     }
 
-    public void setStockName(String stockName) {
-        this.stockName = stockName;
+    public void setStockName(String stock) {
+        this.stock = stock;
     }
 
     public LocalDate getDatePosted() {
