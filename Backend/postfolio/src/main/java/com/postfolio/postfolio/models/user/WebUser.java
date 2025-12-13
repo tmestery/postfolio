@@ -23,6 +23,15 @@ public class WebUser {
     private String firstName;
     private String lastName;
     private LocalDate dateOfBirth; // (yyyy-MM-dd)
+    private Boolean accountPublicStatus; // account public or private
+
+    public Boolean getaccountPublicStatus() {
+        return accountPublicStatus;
+    }
+
+    public void setAccountStatus(Boolean accountPublicStatus) {
+        this.accountPublicStatus = accountPublicStatus;
+    }
 
     public Long getId() {
         return id;
