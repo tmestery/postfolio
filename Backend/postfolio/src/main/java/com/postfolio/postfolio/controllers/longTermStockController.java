@@ -27,8 +27,18 @@ public class longTermStockController {
      */
     @GetMapping("/stock/test/")
     public Map<String, Double> agentStockInvesting() {
+//        System.out.println("Initializing Agents!");
+//        return manage.deployAgents();
+        long start = System.currentTimeMillis();
+
         System.out.println("Initializing Agents!");
-        return manage.deployAgents();
+
+        Map<String, Double> result = manage.deployAgents();
+
+        long duration = System.currentTimeMillis() - start;
+        System.out.println("Agent workflow completed in " + duration + " ms");
+
+        return result;
     }
 
     /**

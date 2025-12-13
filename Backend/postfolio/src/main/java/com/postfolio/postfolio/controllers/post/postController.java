@@ -74,10 +74,28 @@ public class postController {
         return new ResponseEntity<>(post, HttpStatus.CREATED);
     }
 
+    /**
+     * POST http://localhost:8080/post/stock/test/
+     *
+     * @param request
+     * @return a response code
+     */
     @PostMapping("/stock/test/")
     public ResponseEntity<Post> createStockPostTest(@RequestBody StockPostRequest request) {
+        long start = System.currentTimeMillis();
+
         WebUser user = userRepository.findById(1L).orElseThrow(); // fetch user manually
-        Post post = postService.createPost(user, request.dateInvested, request.stock, request.shares, request.investedAmount);
+        Post post = postService.createPost(
+                user,
+                request.dateInvested,
+                request.stock,
+                request.shares,
+                request.investedAmount
+        );
+
+        long duration = System.currentTimeMillis() - start;
+        System.out.println("POST /stock/test completed in " + duration + " ms");
+
         return new ResponseEntity<>(post, HttpStatus.CREATED);
     }
 
@@ -89,5 +107,15 @@ public class postController {
     @GetMapping("/feed/")
     public List<Post> feed() {
         return postService.getFeed();
+    }
+
+    /**
+     * POST http://localhost:8080/post/delete/
+     *
+     * @return a reposone code
+     */
+    @PostMapping("/delete/")
+    public void deletePost(Long postId) {
+        postService.deletePost(postId);
     }
 }

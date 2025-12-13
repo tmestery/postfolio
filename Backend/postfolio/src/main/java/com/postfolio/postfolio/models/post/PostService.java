@@ -37,4 +37,8 @@ public class PostService {
     public List<Post> getFeed() {
         return repository.findAllByOrderByDatePostedDesc();
     }
+
+    public void deletePost(Long postId) {
+        repository.deleteById(postId);
+    }
 }
