@@ -24,7 +24,9 @@
 
 10. ✅ Phase 3.1 agent hardening — `/trade/*` return `503 + {error}` when Finnhub key missing or Ollama/Finnhub down
 
-**Remaining:** Phase 4 polish (tokens iteration, responsive passes) as needed.
+**Next major track:** Agent Trader v2 (Groq + deep multi-agent + capital committee) — see **[agent-trader-v2.md](./agent-trader-v2.md)**.
+
+**Also remaining:** Phase 4 polish (tokens iteration, responsive passes) as needed.
 
 ---
 
