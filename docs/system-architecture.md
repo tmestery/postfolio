@@ -17,12 +17,11 @@ Postfolio is a **browser web app** (not a native mobile app): a React SPA talks 
 └───────┬───────────────────┬───────────────────┬─────────────┘
         │                   │                   │
         ▼                   ▼                   ▼
-   PostgreSQL         Finnhub API         Ollama (local)
-   (local, required)  news + quotes       llama3 + embeddings
-                                              │
-                                              ▼
-                                        RAG vector store
-                                        (JSON file today)
+   PostgreSQL         Public web (RSS/HTML) + Yahoo chart JSON
+   (local, required)  research crew + Price Scout
+                              │
+                              ▼
+                        Groq (LLM debate + capital)
 ```
 
 **Auth (demo):** Browser `localStorage` key `postfolio.session` — not JWT. See [frontend-ui-guide.md](./frontend-ui-guide.md) §5.
@@ -52,16 +51,15 @@ README mentions “connections” — follow graph is **not built**. v1 assumpti
 
 ### 2. LLM agent trader
 
-A multi-agent pipeline (package `stockInvestmentAgents`):
+A multi-agent pipeline (package `stockInvestmentAgents`) — see [agent-trader-v3.md](./agent-trader-v3.md):
 
-1. **Data collection** — Finnhub market headlines (~75)
-2. **RAG** — embed with Ollama `nomic-embed-text`, store/retrieve via `VectorStore`
-3. **Analysis** — `dataAnalyzerAgent` (`llama3`) picks a ticker from retrieved context
-4. **Sizing** — `costAnalysisAgent` chooses share count within ~$1000 allowance
-5. **Loop** — until allowance exhausted
-6. **Execute** — `executeAgent` attaches live quotes / simulated fill details
+1. **Research crew** — Source Planner → Web Scout → Evidence Packer (allowlisted public RSS/HTML)
+2. **Ticker debate** — Bull → Bear → Stock Judge (Groq)
+3. **Price Scout** — Yahoo chart JSON quotes for advanced tickers
+4. **Capital committee** — allocators → Cash Guard → Capital Judge → Risk Gate
+5. **Execute** — simulated fills within ~$1000 allowance
 
-Decision agent stubs (`safeDecisionAgent`, `riskyDecisionAgent`) and Reuters `DataScraper` are incomplete / unused on the happy path. Weekly scheduling is described in marketing copy but **not implemented** (manual `GET` only).
+Weekly scheduling is described in marketing copy but **not implemented** (manual `GET` only).
 
 ---
 
@@ -72,10 +70,10 @@ Decision agent stubs (`safeDecisionAgent`, `riskyDecisionAgent`) and Reuters `Da
 | `controllers/loginSignup` | Signup + login | Works; login returns plain string; FE stores localStorage session |
 | `controllers/account` | Public/private toggle | Fragile (package / wiring issues historically) |
 | `controllers/post` | CRUD-ish posts + feed + search | Needs **username demo bridge** for create without principal |
-| `controllers/longTermStockController` | Agent HTTP entry | Works locally with keys + Ollama |
+| `controllers/longTermStockController` | Agent HTTP entry | Works locally with `GROQ_API_KEY` |
 | `models/user`, `models/post` | JPA entities | Core fields exist |
 | `security/SecurityConfig` | BCrypt, CORS, authorizeHttpRequests | Over-permissive; fine for localStorage demo |
-| `stockInvestmentAgents/**` | LLM + RAG pipeline | Functional locally; brittle error handling |
+| `stockInvestmentAgents/**` | Groq debate + web research + capital | Functional locally; see agent-trader-v3 |
 | `services/`, `utils/` | Empty placeholders | — |
 
 ### Config
@@ -110,8 +108,8 @@ Detailed FE rules: [frontend-ui-guide.md](./frontend-ui-guide.md).
 |---------|-------|--------|
 | Who can POST a trade | Principal often null; use username bridge | Username from localStorage session (demo) |
 | Who can delete | Unclear binding; no owner check | Owner check via username for demo |
-| Agent cost | Unbounded local Ollama + Finnhub quota | Rate limit later; manual trigger for demo |
-| Secrets | Env for Finnhub/Postgres; never in FE | Same; document in `.env.example` |
+| Agent cost | Groq + scrape budget / wall-clock timeout | Rate limit later; manual trigger for demo |
+| Secrets | Env for Groq/Postgres; never in FE | Same; document in `.env.example` |
 | Private profiles | Field exists | Feed + profile honor it |
 | Session | None on server | `postfolio.session` in localStorage |
 

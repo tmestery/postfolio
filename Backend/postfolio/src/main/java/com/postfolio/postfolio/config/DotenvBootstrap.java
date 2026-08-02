@@ -7,8 +7,8 @@ import java.nio.file.Path;
 
 /**
  * Loads a repo-root (or nearby) {@code .env} into JVM system properties before
- * Spring starts, so {@code GROQ_API_KEY}, {@code FINNHUB_API_KEY}, and datasource
- * vars work without exporting them in the shell.
+ * Spring starts, so {@code GROQ_API_KEY} and datasource vars work without
+ * exporting them in the shell.
  *
  * Existing environment variables always win over {@code .env} values.
  */

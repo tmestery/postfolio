@@ -247,7 +247,7 @@ stockInvestmentAgents/
   capital/…         # keep
   execute/…         # keep
   groq/…            # keep
-  news/             # DELETE Finnhub NewsScout + QuoteService after cutover
+  # news/ deleted — Finnhub NewsScout + QuoteService removed
 ```
 
 ---
@@ -306,11 +306,11 @@ Example — Web Scout:
 
 ## 13. Acceptance criteria (v3 demo)
 
-1. No `FINNHUB_API_KEY` in `.env.example` / setup happy path.  
-2. With only `GROQ_API_KEY`, execute run returns candidates + quotes + fills (or clear partial).  
-3. Evidence items include URLs the scouts fetched.  
-4. Agent desk shows a **single live window** of spawns + results; no call-trace inspector.  
-5. Capital committee + Risk Gate behavior from v2 still holds.
+1. ✅ No `FINNHUB_API_KEY` in `.env.example` / setup happy path.  
+2. ✅ With only `GROQ_API_KEY`, execute run returns candidates + quotes + fills (or clear partial).  
+3. ✅ Evidence items include URLs the scouts fetched (`evidencePack` / Sources strip).  
+4. ✅ Agent desk shows a **single live window** of spawns + results; no call-trace inspector.  
+5. ✅ Capital committee + Risk Gate behavior from v2 still holds.
 
 ---
 
