@@ -188,30 +188,27 @@ Long-running. Expect timeouts; set a long client timeout or show “still workin
 
 ### `GET /trade/stock/test/`
 
-Runs LLM agent pipeline (`manager.deployAgents()`).
+Deep multi-agent research run (paper book through Risk Gate, **no fills**). Optional `?username=` for demo attribution.
 
-**Response:** `200` + map:
+**Response:** `200` + `RunResult` DTO — see [agent-trader-v2.md](./agent-trader-v2.md) §8. Key fields: `runId`, `status`, `candidates`, `allocatorProposals`, `capitalJudgeDecision`, `plannedShares`, `agentTrace`.
 
-```json
-{
-  "AAPL": 2.0,
-  "MSFT": 1.5
-}
-```
+Requires `GROQ_API_KEY` + `FINNHUB_API_KEY`.
 
-Values = share counts (doubles). Requires Finnhub + Ollama.
-
-**Failure:** `503` + `{"error": "..."}` when `FINNHUB_API_KEY` is missing, Finnhub is unreachable/returns nothing, or Ollama is down (message says which).
+**Failure:** `503` + `{"error": "..."}` when Groq/Finnhub key missing or provider down.
 
 ### `GET /trade/stock/execute/`
 
-Re-runs decisions then prices them (`executeAgent`) with allowance `1000`. Repeatable — no one-shot lockout.
+Same pipeline **including** simulated fills. Repeatable — no one-shot lockout.
 
-**Response:** `200` + `Map<String, Object>` with `executedTrades` (ticker → `{shares, price, cost}`), `totalInvested`, `remainingAllowance`.
+**Response:** `200` + full `RunResult` with `executedTrades` (ticker → `{shares, price, cost}`), `totalInvested`, `remainingAllowance`, and `agentTrace`.
 
 **Failure:** `503` + `{"error": "..."}` (same dependency checks as research).
 
-**Frontend:** Always defensive render (`Object.entries`, check typeof).
+### `GET /trade/runs/`
+
+Recent run summaries (no full `result_json` payload).
+
+**Frontend:** Always defensive render (`Object.entries`, check typeof). Treat `status: "partial"` as a successful response with a warning.
 
 ---
 
@@ -226,7 +223,8 @@ Re-runs decisions then prices them (`executeAgent`) with allowance `1000`. Repea
 | search | 200 + array (may be empty) | 500 |
 | delete | 204 | 400 / 403 / 404 |
 | account status | 200 + status JSON | 400 / 404 |
-| trade test/execute | 200 + map | 503 + `{error}` if Ollama/Finnhub down or key missing |
+| trade test/execute | 200 + `RunResult` | 503 + `{error}` if Groq/Finnhub down or key missing |
+| trade runs | 200 + summary array | 500 |
 
 ---
 

@@ -9,15 +9,10 @@
 | Java | **21** (matches `pom.xml`) |
 | Maven | Use `./mvnw` wrapper in `Backend/postfolio` |
 | **PostgreSQL** | **Required** (local). Do **not** use H2. |
-| Ollama | Optional; required for agent routes |
-| Finnhub account | API key for news/quotes |
+| Groq account | API key for agent LLM calls (`GROQ_API_KEY`) |
+| Finnhub account | API key for news/quotes (`FINNHUB_API_KEY`) |
 
-Ollama models used by code today:
-
-```bash
-ollama pull llama3
-ollama pull nomic-embed-text
-```
+Ollama is **not** required for the v2 agent path (replaced by Groq).
 
 ---
 
@@ -62,9 +57,11 @@ After first signup you should see user/post tables.
 ```bash
 cd Backend/postfolio
 export FINNHUB_API_KEY=your_key_here
+export GROQ_API_KEY=your_groq_key_here
 export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/postfolio
 export SPRING_DATASOURCE_USERNAME=postfolio
 export SPRING_DATASOURCE_PASSWORD=postfolio
+# optional overrides: GROQ_MODEL_FAST, GROQ_MODEL_JUDGE, AGENT_ALLOWANCE, AGENT_CASH_RESERVE_PCT
 ./mvnw spring-boot:run
 ```
 
@@ -88,7 +85,7 @@ curl -s -i -X POST http://localhost:8080/credentials/login/ \
 # feed
 curl -s http://localhost:8080/post/feed/
 
-# agent (slow; needs Ollama + Finnhub)
+# agent (needs Groq + Finnhub)
 curl -s http://localhost:8080/trade/stock/test/
 ```
 
@@ -154,7 +151,7 @@ Before UI work → **`docs/frontend.md`**. Locked vs open decisions → **`docs/
 | Signup “works” but user incomplete | Snake_case JSON fields (use camelCase) |
 | Login FE can’t parse JSON | Response is **plain text** username |
 | Create post 500 / null user | Need username demo bridge; principal is null |
-| Agent hangs / 500 | Ollama not running, models missing, or Finnhub key unset |
+| Agent 503 | `GROQ_API_KEY` / `FINNHUB_API_KEY` unset, or provider down |
 | Tailwind classes do nothing | Invalid util (`w-200`, `text-large`) |
 
 ---

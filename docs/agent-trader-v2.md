@@ -1,6 +1,6 @@
 # Agent Trader v2 — Deep Multi-Agent Design
 
-**Status:** Design approved for implementation planning (not yet implemented).  
+**Status:** Implemented (v2 pipeline live — Groq multi-agent + capital committee).  
 **Audience:** Coding agents + humans rebuilding the LLM agent trader.  
 **Related:** [architecture.md](./architecture.md) · [api.md](./api.md) · [plan.md](./plan.md) · [setup.md](./setup.md)
 
