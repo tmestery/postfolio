@@ -55,7 +55,7 @@ It must still produce a **working demo**: one button → structured result withi
 | Min cash reserve (Cash Guard) | `15%` ($150) |
 | Max stock candidates into debate | `8` |
 | Max positions after capital judge | `5` |
-| Max single-name weight (of deployed capital) | `35%` |
+| Max single-name weight (of starting allowance) | `35%` |
 | Min position notional | `$50` or 1 share (whichever is feasible) |
 | Stock debate rounds | `1` (Bull → Bear → Judge) |
 | Stock reflection rounds | `0` or `1` (optional) |
@@ -221,6 +221,13 @@ It must still produce a **working demo**: one button → structured result withi
 
 Only `decision: "advance"` tickers enter the capital committee (cap 5–8).
 
+### 5.5b Quote snapshot + investability gate (code, no LLM)
+
+Immediately after the Stock Judge, the Supervisor fetches **one Finnhub quote snapshot** for all advanced tickers:
+
+- Ticker has no quote / price ≤ 0 → **rejected here** (trace `rejected: "no_valid_quote"`), *before* any capital is debated over it.
+- The snapshot `{ ticker → price }` is passed to the allocators, Position Sizer, Risk Gate, **and Executor** — quotes are fetched **once per run** so prices cannot drift between sizing and execution (drift could otherwise breach the cash floor after Risk Gate approval).
+
 ### 5.6 Optional reflection (max 1 round)
 
 Supervisor may ask Bull to revise top pick(s) given Bear + Judge notes. Default **off** or **max 1** so demos stay snappy.
@@ -339,12 +346,12 @@ Dollar amounts are **notionals**, not shares. Sum of proposal ≤ deployable cap
 
 ### 6.8 Position Sizer (code-heavy; optional tiny LLM)
 
-**Role:** Convert approved dollar map → share counts using Finnhub last price.
+**Role:** Convert approved dollar map → share counts using the **run's quote snapshot** (§5.5b) — no re-fetch.
 
 **Rules:**
 - Whole shares only for demo clarity (`floor(dollars / price)`).
-- If price missing / 0 → skip ticker, return dollars to cash, trace `skipped: "no_quote"`.
 - If shares would be 0 → skip, return dollars to cash, trace `skipped: "cannot_afford_one_share"`.
+- (No-quote tickers were already rejected at §5.5b, so the sizer never sees them.)
 - Recompute `remainingAllowance` after all conversions.
 
 ### 6.9 Risk / Book Gate (code rules + optional LLM check)
@@ -352,7 +359,7 @@ Dollar amounts are **notionals**, not shares. Sum of proposal ≤ deployable cap
 **Hard rules (must enforce in code):**
 1. No invalid tickers  
 2. ≤ max positions  
-3. Single-name weight ≤ 35% of **deployed** capital (or of starting allowance — pick one and document in code; recommend **deployed**)  
+3. Single-name weight ≤ 35% of the **starting allowance** (i.e. ≤ $350 on a $1000 book). Basis is starting allowance, not deployed capital — a deployed-capital basis is unsatisfiable when only 1–2 names advance (one name = 100% of deployed).  
 4. Total cost ≤ starting allowance − reserve (i.e. never breach Cash Guard floor)  
 5. No duplicate tickers  
 
@@ -377,7 +384,7 @@ Dollar amounts are **notionals**, not shares. Sum of proposal ≤ deployable cap
 Same spirit as v1 `executeAgent`, cleaned up:
 
 - Input: `{ ticker → shares }` from Position Sizer / Risk Gate  
-- Fetch Finnhub quote per ticker  
+- Fill at the **run's quote snapshot price** (§5.5b) — no re-fetch, so cost math exactly matches what Risk Gate approved  
 - Build `executedTrades`: `{ shares, price, cost }`  
 - Update totals  
 - **No one-shot lockout** — runs are repeatable  
@@ -656,7 +663,8 @@ Delete or quarantine dead Ollama code once Slice 6 is green to avoid two sources
 | Stock reflection round | **Optional, max 1** | Force off |
 | `/trade/stock/test/` depth | Paper book through sizer, no executor | Stop after stock judge |
 | Light headline filtering vs full RAG | **Light filter** | Add embeddings later |
-| Single-name weight basis | **% of deployed capital** | % of starting allowance |
+| Single-name weight basis | **% of starting allowance** (deployed-capital basis is degenerate with 1–2 names) | — |
+| Quote fetching | **One snapshot per run** (§5.5b) | — |
 
 ---
 
