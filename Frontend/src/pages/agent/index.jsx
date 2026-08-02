@@ -246,6 +246,7 @@ function BookOrFills({ result, mode }) {
 
 function ResultBlocks({ result, mode }) {
   const quotes = Object.entries(result.quoteSnapshot ?? {})
+  const evidence = Array.isArray(result.evidencePack) ? result.evidencePack : []
   return (
     <div className="space-y-5">
       {(result.status === 'partial' || result.error) && (
@@ -253,6 +254,22 @@ function ResultBlocks({ result, mode }) {
           {result.status === 'partial' ? 'Partial run: ' : ''}
           {result.error || 'Run finished with warnings.'}
         </p>
+      )}
+
+      {evidence.length > 0 && (
+        <section>
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">Sources</h3>
+          <ul className="mt-2 space-y-1 text-xs text-muted">
+            {evidence.slice(0, 8).map((row) => (
+              <li key={row.url || row.title} className="truncate">
+                <span className="text-ink">{row.title}</span>
+                {row.url ? (
+                  <span className="ml-1 font-mono text-[10px] text-muted">· {row.url}</span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       <section>
@@ -520,9 +537,8 @@ export default function AgentPage() {
 
       {status === 'idle' && (
         <p className="mt-3 text-xs text-muted">
-          Needs <code className="font-mono">GROQ_API_KEY</code>
-          {'. '}
-          Finnhub is being replaced — see <code className="font-mono">docs/agent-trader-v3.md</code>.
+          Needs <code className="font-mono">GROQ_API_KEY</code>. Scrapes public news feeds and Yahoo
+          quotes — see <code className="font-mono">docs/agent-trader-v3.md</code>.
         </p>
       )}
 

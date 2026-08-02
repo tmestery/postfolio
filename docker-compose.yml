@@ -1,7 +1,6 @@
 # Postfolio local stack
 #
 # Quick start:
-#   cp .env.example .env          # fill GROQ_API_KEY + FINNHUB_API_KEY
 #   docker compose up --build
 #
 # Services:
@@ -50,7 +49,6 @@ services:
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postfolio}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postfolio}
       GROQ_API_KEY: ${GROQ_API_KEY:-}
-      FINNHUB_API_KEY: ${FINNHUB_API_KEY:-}
       GROQ_MODEL_FAST: ${GROQ_MODEL_FAST:-llama-3.1-8b-instant}
       GROQ_MODEL_JUDGE: ${GROQ_MODEL_JUDGE:-llama-3.3-70b-versatile}
       AGENT_ALLOWANCE: ${AGENT_ALLOWANCE:-1000}

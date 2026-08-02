@@ -1,7 +1,7 @@
 package com.postfolio.postfolio.stockInvestmentAgents;
 
 /**
- * Thrown when a dependency of the agent pipeline (Groq or Finnhub key/API)
+ * Thrown when a dependency of the agent pipeline (Groq or web research)
  * is missing or unreachable. Controllers translate this into a 503 with a
  * JSON error body.
  */

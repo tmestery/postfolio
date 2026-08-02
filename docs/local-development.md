@@ -4,7 +4,7 @@
 
 ```bash
 cp .env.example .env
-# put GROQ_API_KEY and FINNHUB_API_KEY in .env
+# put GROQ_API_KEY in .env
 make up          # or: docker compose up --build
 ```
 
@@ -35,7 +35,6 @@ See root `Makefile` and `.env.example`.
 | **PostgreSQL** | **Required** (local or Docker). Do **not** use H2 at runtime. |
 | Docker | Optional; easiest way to run Postgres / full stack |
 | Groq account | API key for agent LLM calls (`GROQ_API_KEY`) |
-| Finnhub account | API key for news/quotes (`FINNHUB_API_KEY`) |
 
 Ollama is **not** required for the v2 agent path (replaced by Groq).
 
@@ -47,7 +46,7 @@ Put secrets in the **repo root** `.env` (gitignored):
 
 ```bash
 cp .env.example .env
-# edit GROQ_API_KEY=... and FINNHUB_API_KEY=...
+# edit GROQ_API_KEY=...
 make env   # also writes Frontend/.env with VITE_* vars
 ```
 
@@ -95,7 +94,6 @@ After first signup you should see user/post tables.
 
 ```bash
 cd Backend/postfolio
-export FINNHUB_API_KEY=your_key_here
 export GROQ_API_KEY=your_groq_key_here
 export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/postfolio
 export SPRING_DATASOURCE_USERNAME=postfolio
@@ -124,7 +122,7 @@ curl -s -i -X POST http://localhost:8080/credentials/login/ \
 # feed
 curl -s http://localhost:8080/post/feed/
 
-# agent (needs Groq + Finnhub)
+# agent (needs Groq; web research scrapes public news + Yahoo quotes)
 curl -s http://localhost:8080/trade/stock/test/
 ```
 
@@ -190,7 +188,7 @@ Before UI work → **`docs/frontend-ui-guide.md`**. Locked vs open decisions →
 | Signup “works” but user incomplete | Snake_case JSON fields (use camelCase) |
 | Login FE can’t parse JSON | Response is **plain text** username |
 | Create post 500 / null user | Need username demo bridge; principal is null |
-| Agent 503 | `GROQ_API_KEY` / `FINNHUB_API_KEY` unset, or provider down |
+| Agent 503 | `GROQ_API_KEY` unset, Groq down, or web research returned no headlines |
 | Tailwind classes do nothing | Invalid util (`w-200`, `text-large`) |
 
 ---

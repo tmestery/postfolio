@@ -1,10 +1,12 @@
-/** Ordered stages the supervisor is expected to spawn (docs/agent-trader-v2.md). */
+/** Ordered stages the supervisor is expected to spawn (docs/agent-trader-v3.md). */
 export const PIPELINE_STAGES = [
-  { id: 'news_scout', label: 'News Scout', call: 'Finnhub news', kind: 'api' },
+  { id: 'source_planner', label: 'Source Planner', call: 'Groq plan', kind: 'llm' },
+  { id: 'web_scout', label: 'Web Scout', call: 'HTTP scrape', kind: 'api' },
+  { id: 'evidence_packer', label: 'Evidence Packer', call: 'rank/dedupe', kind: 'rules' },
   { id: 'bull', label: 'Bull Agent', call: 'Groq chat', kind: 'llm' },
   { id: 'bear', label: 'Bear Agent', call: 'Groq chat', kind: 'llm' },
   { id: 'stock_judge', label: 'Stock Judge', call: 'Groq chat', kind: 'llm' },
-  { id: 'quote_snapshot', label: 'Quote Snapshot', call: 'Finnhub quote', kind: 'api' },
+  { id: 'price_scout', label: 'Price Scout', call: 'Yahoo chart', kind: 'api' },
   { id: 'allocator_aggressive', label: 'Aggressive Allocator', call: 'rules', kind: 'rules' },
   { id: 'allocator_balanced', label: 'Balanced Allocator', call: 'rules', kind: 'rules' },
   { id: 'allocator_defensive', label: 'Defensive Allocator', call: 'rules', kind: 'rules' },

@@ -23,6 +23,8 @@ public class RunResult {
     public List<Candidate> candidates = new ArrayList<>();
     public List<Map<String, String>> rejectedTickers = new ArrayList<>();
     public Map<String, Double> quoteSnapshot = new LinkedHashMap<>();
+    /** Scraped evidence for the desk (docs/agent-trader-v3.md). */
+    public List<Map<String, Object>> evidencePack = new ArrayList<>();
 
     public Map<String, Map<String, Double>> allocatorProposals = new LinkedHashMap<>();
     public Map<String, Object> cashGuard = new LinkedHashMap<>();
