@@ -121,10 +121,12 @@ Code must read `import.meta.env.VITE_*` — not `process.env` (see [frontend.md]
 
 After login/signup, FE stores `localStorage['postfolio.session']` = `{"username":"...","id":...}`. See [frontend.md](./frontend.md) §5. This is intentional for demos — not production security.
 
-### Lint
+### Lint & tests
 
 ```bash
-cd Frontend && npm run lint
+cd Frontend
+npm run lint
+npm test        # Vitest (jsdom)
 ```
 
 Follow [anti-linter-patterns.md](./anti-linter-patterns.md).

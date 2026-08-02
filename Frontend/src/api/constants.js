@@ -1,6 +1,5 @@
+export const IS_PROD = import.meta.env.PROD
 
-export const IS_PROD = process.env.NODE_ENV === 'production'
+export const SERVER_URL = import.meta.env.VITE_SERVER_URL ?? 'http://localhost:8080'
 
-export const SERVER_URL = process.env.SERVER_URL
-
-export const CLIENT_URL = process.env.CLIENT_URL
+export const CLIENT_URL = import.meta.env.VITE_CLIENT_URL ?? 'http://localhost:5173'
