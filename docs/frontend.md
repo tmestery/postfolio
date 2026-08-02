@@ -101,7 +101,7 @@ VITE_SERVER_URL=http://localhost:8080
 VITE_CLIENT_URL=http://localhost:5173
 ```
 
-Never commit real secrets. Frontend should not hold Finnhub/Ollama keys.
+Never commit real secrets. Frontend should not hold Finnhub/Groq keys.
 
 ### Fetch rules
 
@@ -215,9 +215,10 @@ Rules:
 ### Agent (`/agent`)
 
 - Authed only (localStorage). Shared house agent for demo.
-- Trigger research: `GET /trade/stock/test/` → map of `ticker → shares`.
-- Execute: `GET /trade/stock/execute/` → richer object (prices, allowance).
-- These calls can take **tens of seconds** (Ollama). Mandatory: loading state, cancel/leave messaging, never block the whole app shell without feedback.
+- Trigger research: `GET /trade/stock/test/` → `RunResult` (paper book + `agentTrace`, no fills).
+- Execute: `GET /trade/stock/execute/` → full `RunResult` with fills + capital panel data.
+- Render `agentTrace[]`, allocator proposals, Capital Judge, and fills (see [agent-trader-v2.md](./agent-trader-v2.md) §9).
+- Calls can take **tens of seconds** (multi-agent Groq). Mandatory: loading state, leave-page messaging, never block the shell without feedback.
 - Show results as a simple list/table — not a trading terminal parody.
 
 ### Account

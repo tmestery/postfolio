@@ -14,7 +14,7 @@ and follow an LLM agent trader that reads market news and simulates its own pick
 ![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38BDF8?logo=tailwindcss&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-local-4169E1?logo=postgresql&logoColor=white)
-![Ollama](https://img.shields.io/badge/Ollama-llama3-black)
+![Groq](https://img.shields.io/badge/Groq-LLM-orange)
 
 *Web app (desktop + mobile browsers) — not a native mobile app. Simulated trades only; not financial advice.*
 
@@ -27,7 +27,7 @@ and follow an LLM agent trader that reads market news and simulates its own pick
 | Pillar | Description |
 |--------|-------------|
 | **Social investment feed** | Sign up, post trades (ticker, shares, amount, date), and browse everyone's public positions newest-first. Search by ticker, delete your own posts, and flip your account private to drop out of the feed. |
-| **AI agent trader** | A multi-agent pipeline pulls ~75 market headlines from Finnhub, embeds them into a local RAG vector store (`nomic-embed-text`), has `llama3` pick the strongest ticker, sizes the position within a $1,000 allowance, and prices the simulated fills with live quotes. |
+| **AI agent trader** | A deep multi-agent desk on Groq: Finnhub news → bull/bear debate → stock judge → capital committee (aggressive / balanced / defensive + cash guard + capital judge) → risk gate → simulated fills within a $1,000 allowance. Full `agentTrace` for the UI. |
 | **Demo-grade auth** | Deliberately simple `localStorage` session (`postfolio.session`) with auto-login after signup and protected routes — no JWT/cookie machinery, by design (see [locked decisions](docs/open-questions.md)). |
 
 ## Architecture
@@ -47,25 +47,23 @@ and follow an LLM agent trader that reads market news and simulates its own pick
 └──────┬────────────────────┬─────────────────────┬────────────┘
        │                    │                     │
        ▼                    ▼                     ▼
-  PostgreSQL           Finnhub API           Ollama (local)
-  users + posts        news + quotes         llama3 + embeddings
-                                                  │
-                                                  ▼
-                                          RAG vector store
+  PostgreSQL           Finnhub API           Groq API
+  users + posts        news + quotes         chat completions
+  + agent_run
 ```
 
 ### The agent pipeline, step by step
 
-1. **Collect** — `dataCollection` fetches ~75 market headlines from Finnhub
-2. **Embed** — each headline is embedded via Ollama `nomic-embed-text` into a vector store
-3. **Retrieve** — a growth/sentiment query pulls the 25 most relevant headlines (RAG)
-4. **Analyze** — `dataAnalyzerAgent` (`llama3`) names the single strongest ticker
-5. **Size** — `costAnalysisAgent` converts an LLM dollar recommendation into whole shares
-6. **Loop** — repeat until the $1,000 allowance is spent
-7. **Execute** — `executeAgent` prices the basket with live Finnhub quotes and reports cost, total invested, and remaining allowance
+1. **News Scout** — Finnhub market headlines
+2. **Bull → Bear → Stock Judge** — adversarial ticker debate on Groq
+3. **Quote snapshot** — one Finnhub price map; drop unquoted names
+4. **Capital committee** — Aggressive / Balanced / Defensive allocators + Cash Guard + Capital Judge
+5. **Position Sizer + Risk Gate** — dollars → whole shares; enforce reserve floor & weight caps
+6. **Executor** — simulated fills at the same snapshot prices
+7. **Persist** — run summary + full `RunResult` JSON for history
 
-Every dependency failure (missing Finnhub key, Finnhub down, Ollama offline) returns a
-structured `503 + {"error": "..."}` that the UI surfaces verbatim.
+Every dependency failure (missing Groq/Finnhub key, provider down) returns a
+structured `503 + {"error": "..."}` that the UI surfaces verbatim. Details: [docs/agent-trader-v2.md](docs/agent-trader-v2.md).
 
 ## Feature checklist
 
@@ -75,14 +73,14 @@ structured `503 + {"error": "..."}` that the UI surfaces verbatim.
 - [x] Feed with loading / error / empty states, public-accounts-only filtering
 - [x] Ticker search (uppercase-normalized) and two-step inline owner delete — no `alert()`
 - [x] Create post with field validation; server computes price/share
-- [x] Agent page with elapsed-seconds long-run UX for research + execution
+- [x] Agent page with trace timeline, capital committee panel, fills, and recent-run history
 - [x] Account privacy toggle that immediately hides/shows your posts in the feed
 - [x] 404 route, custom design tokens (Fraunces + Instrument Sans, warm paper + market green)
-- [x] 46 automated tests (35 backend MockMvc/unit · 11 frontend Vitest) and a two-job CI
+- [x] Automated tests (backend MockMvc/unit · frontend Vitest) and CI
 
 ## Quick start
 
-**Prerequisites:** Java 21 · Node 20+ · local PostgreSQL · *(optional, for the agent)* [Ollama](https://ollama.com) + a [Finnhub](https://finnhub.io) API key.
+**Prerequisites:** Java 21 · Node 20+ · local PostgreSQL · *(for the agent)* [Groq](https://groq.com) + [Finnhub](https://finnhub.io) API keys.
 
 ```bash
 # 1. Database (once)
@@ -93,7 +91,8 @@ cd Backend/postfolio
 export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/postfolio
 export SPRING_DATASOURCE_USERNAME=$USER
 export SPRING_DATASOURCE_PASSWORD=
-export FINNHUB_API_KEY=your_key        # optional — agent endpoints 503 without it
+export FINNHUB_API_KEY=your_key
+export GROQ_API_KEY=your_groq_key      # agent endpoints 503 without Groq + Finnhub
 ./mvnw spring-boot:run
 
 # 3. Frontend  →  http://localhost:5173   (separate terminal)

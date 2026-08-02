@@ -1,13 +1,21 @@
 import { apiFetch } from './client'
 
-/** Agent research: returns a map of ticker -> shares. Slow (local LLM). */
-export async function runAgentResearch() {
-  const { data } = await apiFetch('/trade/stock/test/')
+/** Research run: full pipeline through Risk Gate, paper book only (no fills). */
+export async function runAgentResearch(username) {
+  const qs = username ? `?username=${encodeURIComponent(username)}` : ''
+  const { data } = await apiFetch(`/trade/stock/test/${qs}`)
   return data && typeof data === 'object' ? data : {}
 }
 
-/** Research + priced execution with a $1000 allowance. Slow (local LLM). */
-export async function executeAgentTrades() {
-  const { data } = await apiFetch('/trade/stock/execute/')
+/** Full run including simulated fills + agentTrace. */
+export async function executeAgentTrades(username) {
+  const qs = username ? `?username=${encodeURIComponent(username)}` : ''
+  const { data } = await apiFetch(`/trade/stock/execute/${qs}`)
   return data && typeof data === 'object' ? data : {}
+}
+
+/** Recent agent run summaries. */
+export async function listAgentRuns() {
+  const { data } = await apiFetch('/trade/runs/')
+  return Array.isArray(data) ? data : []
 }
