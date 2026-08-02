@@ -11,8 +11,8 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 
 @Getter
@@ -23,7 +23,11 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "post_seq")
     @SequenceGenerator(name = "post_seq", sequenceName = "post_seq", allocationSize = 1)
     private Long id;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDate dateInvested;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDateTime datePosted = LocalDateTime.now();
     private String stock;
     private double shares;

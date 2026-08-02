@@ -1,12 +1,9 @@
 package com.postfolio.postfolio.models.post;
 
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
-import com.postfolio.postfolio.models.post.PostRepository;
-import com.postfolio.postfolio.models.post.Post;
 import com.postfolio.postfolio.models.user.WebUser;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 
@@ -31,11 +28,17 @@ public class PostService {
         post.setStock(stock);
         post.setShares(shares);
         post.setInvestedAmount(investedAmount);
+        post.setPricePerShare(shares > 0 ? investedAmount / shares : 0);
         return repository.save(post);
     }
 
+    /** Feed only shows posts from public accounts. */
     public List<Post> getFeed() {
-        return repository.findAllByOrderByDatePostedDesc();
+        return repository.findAllByUserAccountPublicStatusTrueOrderByDatePostedDesc();
+    }
+
+    public Optional<Post> findById(Long postId) {
+        return repository.findById(postId);
     }
 
     public void deletePost(Long postId) {

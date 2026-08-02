@@ -4,38 +4,31 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import com.postfolio.postfolio.models.post.PostRepository;
+import org.springframework.http.HttpStatus;
 import com.postfolio.postfolio.models.post.Post;
 import com.postfolio.postfolio.models.post.PostService;
-import com.postfolio.postfolio.models.user.WebUser;
-import org.springframework.http.HttpStatus;
-import java.time.LocalDate;
-import org.springframework.web.bind.annotation.RequestParam;
-import java.time.LocalDateTime;
-import org.springframework.web.bind.annotation.ResponseBody;
-import java.util.List;
-import java.util.Optional;
 import com.postfolio.postfolio.models.user.UserRepository;
 import com.postfolio.postfolio.models.user.WebUser;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/post")
 public class postController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PostService postService;
 
-    @Autowired
-    private PostRepository repository;
-
-    private PostService postService;
-
-    public postController(PostService postService) {
+    public postController(PostService postService, UserRepository userRepository) {
         this.postService = postService;
+        this.userRepository = userRepository;
     }
 
     public static class StockPostRequest {
@@ -43,66 +36,68 @@ public class postController {
         public String stock;
         public Double shares;
         public Double investedAmount;
+        /** Demo bridge: identifies the author while there is no server session. */
+        public String username;
     }
 
     /**
-     * POST http://localhost:8080/post/stock/search/
+     * POST http://localhost:8080/post/stock/search/?stockName=AAPL
      *
-     * @return a list of posts that contain that stock (***feature not specific to user currently)
+     * @return 200 + matching posts (empty list when none)
      */
     @PostMapping("/stock/search/")
-    @ResponseBody
     public ResponseEntity<List<Post>> searchForStocks(@RequestParam String stockName) {
-        List<Post> posts = postService.getPostsByStock(stockName);
-        if (!posts.isEmpty()) {
-            return ResponseEntity.ok(posts);
-        }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(postService.getPostsByStock(stockName.trim().toUpperCase()));
     }
 
     /**
      * POST http://localhost:8080/post/stock/
      *
-     * @return a success or failure code (***feature not specific to user currently)
+     * Uses the authenticated principal when present; otherwise resolves the
+     * author from {@code username} in the body (locked demo bridge).
+     *
+     * @return 201 + created post, 400 on validation/unknown user
      */
     @PostMapping("/stock/")
-    @ResponseBody
-    public ResponseEntity<Post> createStockPost(@AuthenticationPrincipal WebUser user, @RequestBody StockPostRequest request) {
+    public ResponseEntity<?> createStockPost(@AuthenticationPrincipal WebUser principal,
+                                             @RequestBody StockPostRequest request) {
+        WebUser author = principal;
+        if (author == null) {
+            if (request.username == null || request.username.isBlank()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "username is required"));
+            }
+            Optional<WebUser> resolved = userRepository.findByUsername(request.username);
+            if (resolved.isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "unknown user: " + request.username));
+            }
+            author = resolved.get();
+        }
 
-        Post post = postService.createPost(user, request.dateInvested, request.stock, request.shares, request.investedAmount);
-        post.setUser(user);
-        return new ResponseEntity<>(post, HttpStatus.CREATED);
-    }
+        if (request.stock == null || request.stock.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "stock ticker is required"));
+        }
+        if (request.shares == null || request.shares <= 0) {
+            return ResponseEntity.badRequest().body(Map.of("error", "shares must be greater than 0"));
+        }
+        if (request.investedAmount == null || request.investedAmount <= 0) {
+            return ResponseEntity.badRequest().body(Map.of("error", "investedAmount must be greater than 0"));
+        }
 
-    /**
-     * POST http://localhost:8080/post/stock/test/
-     *
-     * @param request
-     * @return a response code
-     */
-    @PostMapping("/stock/test/")
-    public ResponseEntity<Post> createStockPostTest(@RequestBody StockPostRequest request) {
-        long start = System.currentTimeMillis();
-
-        WebUser user = userRepository.findById(1L).orElseThrow(); // fetch user manually
         Post post = postService.createPost(
-                user,
+                author,
                 request.dateInvested,
-                request.stock,
+                request.stock.trim().toUpperCase(),
                 request.shares,
-                request.investedAmount
-        );
-
-        long duration = System.currentTimeMillis() - start;
-        System.out.println("POST /stock/test completed in " + duration + " ms");
-
+                request.investedAmount);
         return new ResponseEntity<>(post, HttpStatus.CREATED);
     }
 
     /**
-     * POST http://localhost:8080/post/feed/
+     * GET http://localhost:8080/post/feed/
      *
-     * @return
+     * @return 200 + newest-first posts from public accounts
      */
     @GetMapping("/feed/")
     public List<Post> feed() {
@@ -110,12 +105,24 @@ public class postController {
     }
 
     /**
-     * POST http://localhost:8080/post/delete/
+     * POST http://localhost:8080/post/delete/?postId=1&username=demo
      *
-     * @return a reposone code
+     * Only the post owner may delete (username demo bridge).
+     *
+     * @return 204 deleted, 403 not owner, 404 unknown post, 400 missing params
      */
     @PostMapping("/delete/")
-    public void deletePost(Long postId) {
+    public ResponseEntity<?> deletePost(@RequestParam Long postId, @RequestParam String username) {
+        Optional<Post> post = postService.findById(postId);
+        if (post.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "post not found"));
+        }
+        if (post.get().getUser() == null || !username.equals(post.get().getUser().getUsername())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "only the post owner can delete it"));
+        }
         postService.deletePost(postId);
+        return ResponseEntity.noContent().build();
     }
 }
