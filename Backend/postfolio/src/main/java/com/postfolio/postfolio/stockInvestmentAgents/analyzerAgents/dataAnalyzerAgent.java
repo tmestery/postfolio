@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.postfolio.postfolio.stockInvestmentAgents.AgentUnavailableException;
 
 @Service
 public class dataAnalyzerAgent {
@@ -40,8 +41,8 @@ public class dataAnalyzerAgent {
             String stock = aiResult.get("response").toString();
             return stock;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new AgentUnavailableException(
+                    "Ollama is not reachable at localhost:11434 (llama3 analysis)", e);
         }
-        return "stock here";
     }
 }

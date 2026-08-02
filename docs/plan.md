@@ -22,7 +22,9 @@
 8. ✅ Search / delete / account privacy  
 9. ✅ CI (JDK 21 + frontend lint/test/build job)  
 
-**Remaining:** Phase 3.1 agent hardening (structured errors when Ollama/Finnhub down) and Phase 4 polish as needed.
+10. ✅ Phase 3.1 agent hardening — `/trade/*` return `503 + {error}` when Finnhub key missing or Ollama/Finnhub down
+
+**Remaining:** Phase 4 polish (tokens iteration, responsive passes) as needed.
 
 ---
 

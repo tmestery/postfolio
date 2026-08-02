@@ -2,6 +2,7 @@ package com.postfolio.postfolio.stockInvestmentAgents.rag;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.postfolio.postfolio.stockInvestmentAgents.AgentUnavailableException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -32,6 +33,10 @@ public class EmbeddingService {
 
             JsonNode root = mapper.readTree(response.body());
             JsonNode embeddingNode = root.get("embedding");
+            if (embeddingNode == null || !embeddingNode.isArray()) {
+                throw new AgentUnavailableException(
+                        "Ollama did not return an embedding — is the '" + MODEL + "' model pulled?");
+            }
 
             float[] embedding = new float[embeddingNode.size()];
             for (int i = 0; i < embeddingNode.size(); i++) {
@@ -40,8 +45,11 @@ public class EmbeddingService {
 
             return embedding;
 
+        } catch (AgentUnavailableException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to create embedding", e);
+            throw new AgentUnavailableException(
+                    "Ollama is not reachable at localhost:11434 (embeddings)", e);
         }
     }
 
