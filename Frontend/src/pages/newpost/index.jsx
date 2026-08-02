@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { createPost } from '../../api/posts'
+import { createPost, searchSymbols } from '../../api/posts'
 import { useAuth } from '../../auth/useAuth'
 import Field from '../../components/Field'
 
@@ -39,6 +39,28 @@ export default function NewPostPage() {
   const [fieldErrors, setFieldErrors] = useState({})
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [suggestions, setSuggestions] = useState([])
+  const tickerQuery = form.stock.trim()
+
+  useEffect(() => {
+    if (tickerQuery.length < 1) return undefined
+    let cancelled = false
+    const handle = setTimeout(() => {
+      searchSymbols(tickerQuery)
+        .then((rows) => {
+          if (!cancelled) setSuggestions(rows)
+        })
+        .catch(() => {
+          if (!cancelled) setSuggestions([])
+        })
+    }, 150)
+    return () => {
+      cancelled = true
+      clearTimeout(handle)
+    }
+  }, [tickerQuery])
+
+  const tickerSuggestions = tickerQuery.length < 1 ? [] : suggestions
 
   function update(key) {
     return (event) => setForm({ ...form, [key]: event.target.value })
@@ -62,7 +84,11 @@ export default function NewPostPage() {
       })
       navigate('/')
     } catch (err) {
-      setError(err.message)
+      const message = err.message || 'Could not create post.'
+      if (/unknown stock ticker/i.test(message)) {
+        setFieldErrors((prev) => ({ ...prev, stock: 'Enter a valid listed ticker.' }))
+      }
+      setError(message)
       setSubmitting(false)
     }
   }
@@ -77,14 +103,24 @@ export default function NewPostPage() {
           label="Ticker"
           id="stock"
           type="text"
+          list="ticker-suggestions"
           placeholder="AAPL"
+          hint="must be a listed symbol"
           value={form.stock}
           onChange={(event) =>
             setForm({ ...form, stock: event.target.value.toUpperCase() })
           }
+          autoComplete="off"
           error={fieldErrors.stock}
           required
         />
+        <datalist id="ticker-suggestions">
+          {tickerSuggestions.map((row) => (
+            <option key={row.symbol} value={row.symbol}>
+              {row.name}
+            </option>
+          ))}
+        </datalist>
         <div className="grid grid-cols-2 gap-3">
           <Field
             label="Shares"

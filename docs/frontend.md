@@ -217,9 +217,10 @@ Rules:
 - Authed only (localStorage). Shared house agent for demo.
 - Trigger research: `GET /trade/stock/test/` → `RunResult` (paper book + `agentTrace`, no fills).
 - Execute: `GET /trade/stock/execute/` → full `RunResult` with fills + capital panel data.
-- Render `agentTrace[]`, allocator proposals, Capital Judge, and fills (see [agent-trader-v2.md](./agent-trader-v2.md) §9).
-- Calls can take **tens of seconds** (multi-agent Groq). Mandatory: loading state, leave-page messaging, never block the shell without feedback.
-- Show results as a simple list/table — not a trading terminal parody.
+- **Sell the architecture:** pipeline rail of spawned agents (LLM / API / rules), expandable `agentTrace[]` detail, bull/bear debate board, quote strip, capital committee (3 allocators + Cash Guard + judge), fills/paper book (see [agent-trader-v2.md](./agent-trader-v2.md) §9).
+- History: `GET /trade/runs/` summaries; click → `GET /trade/runs/{id}/` full result.
+- Calls can take **tens of seconds** (multi-agent Groq). Mandatory: loading state with live pipeline progress, leave-page messaging, never block the shell without feedback.
+- Detailed, but not a trading-terminal parody — one vertical narrative, expand for depth.
 
 ### Account
 

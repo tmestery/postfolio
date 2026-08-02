@@ -152,16 +152,22 @@ Newest-first posts from **public accounts only**.
 
 `username` is required while there is no server session (demo bridge): when `@AuthenticationPrincipal` is null, the backend resolves `WebUser` by `username`.
 
-Ticker is normalized to uppercase; `pricePerShare` is computed as `investedAmount / shares`.
+Ticker is normalized to uppercase and **must exist** in the `stock_symbol` table (seeded on empty DB; reload via `scripts/seed-stock-symbols.sql`). `pricePerShare` is computed as `investedAmount / shares`.
 
 **Responses:**
 
 | Status | Meaning |
 |--------|---------|
 | `201` | Created — body is the `Post` |
-| `400` | Missing/unknown username, missing ticker, `shares <= 0`, `investedAmount <= 0` — `{"error": "..."}` |
+| `400` | Missing/unknown username, missing/unknown ticker, `shares <= 0`, `investedAmount <= 0` — `{"error": "..."}` |
 
-**Frontend:** Send `username` from `postfolio.session`.
+**Frontend:** Send `username` from `postfolio.session`. Use `GET /post/symbols/` for typeahead.
+
+### `GET /post/symbols/?q=AA&limit=20`
+
+Prefix search over allowed tickers. Blank `q` → `[]`.
+
+**Response:** `200` + `[{ "symbol": "AAPL", "name": "Apple Inc." }, ...]`
 
 ### `POST /post/stock/search/?stockName=AAPL`
 
@@ -208,7 +214,17 @@ Same pipeline **including** simulated fills. Repeatable — no one-shot lockout.
 
 Recent run summaries (no full `result_json` payload).
 
-**Frontend:** Always defensive render (`Object.entries`, check typeof). Treat `status: "partial"` as a successful response with a warning.
+### `GET /trade/runs/{runId}/`
+
+Full persisted `RunResult` for the agent desk history drill-in.
+
+| Status | Meaning |
+|--------|---------|
+| `200` | Parsed `RunResult` from `result_json` |
+| `400` | Invalid UUID |
+| `404` | Unknown run or empty `result_json` |
+
+**Frontend:** Always defensive render (`Object.entries`, check typeof). Treat `status: "partial"` as a successful response with a warning. Expand `agentTrace[].detail` on the desk.
 
 ---
 

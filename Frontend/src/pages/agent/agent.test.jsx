@@ -13,6 +13,7 @@ const trades = vi.hoisted(() => ({
   runAgentResearch: vi.fn(),
   executeAgentTrades: vi.fn(),
   listAgentRuns: vi.fn(),
+  getAgentRun: vi.fn(),
 }))
 
 vi.mock('../../api/trades', () => trades)
@@ -75,7 +76,9 @@ describe('AgentPage', () => {
     const container = await renderPage()
     await clickButton(container, 'execute')
 
-    expect(container.textContent).toContain('news_scout')
+    expect(container.textContent).toContain('News Scout')
+    expect(container.textContent).toContain('Spawned agents')
+    expect(container.textContent).toContain('Call trace')
     expect(container.textContent).toMatch(/capital judge/i)
     expect(container.textContent).toContain('Mild overweight on NVDA')
     expect(container.textContent).toContain('$240.00')
