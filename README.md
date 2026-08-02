@@ -20,6 +20,8 @@ and follow an LLM agent trader that reads market news and simulates its own pick
 
 </div>
 
+![Agent Trader](docs/agent-trader-look.png)
+
 ---
 
 ## What it does
