@@ -80,35 +80,45 @@ structured `503 + {"error": "..."}` that the UI surfaces verbatim. Details: [doc
 
 ## Quick start
 
-**Prerequisites:** Java 21 · Node 20+ · local PostgreSQL · *(for the agent)* [Groq](https://groq.com) + [Finnhub](https://finnhub.io) API keys.
+**Prerequisites:** Docker **or** (Java 21 · Node 20+ · PostgreSQL) · *(for the agent)* [Groq](https://groq.com) + [Finnhub](https://finnhub.io) API keys.
 
 ```bash
-# 1. Database (once)
+# 0. Secrets (repo root — never commit .env)
+cp .env.example .env
+# edit GROQ_API_KEY=... and FINNHUB_API_KEY=...
+
+# Option A — full stack via Docker
+make up
+# Frontend http://localhost:5173 · Backend http://localhost:8080
+
+# Option B — Postgres in Docker, apps on the host
+make postgres
+make backend     # terminal 1
+make frontend    # terminal 2
+```
+
+<details>
+<summary>Manual host setup (without Make)</summary>
+
+```bash
+# 1. Database (once) — or: docker compose up -d postgres
 createdb postfolio
 
 # 2. Backend  →  http://localhost:8080
 cd Backend/postfolio
-export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/postfolio
-export SPRING_DATASOURCE_USERNAME=$USER
-export SPRING_DATASOURCE_PASSWORD=
-export FINNHUB_API_KEY=your_key
-export GROQ_API_KEY=your_groq_key      # agent endpoints 503 without Groq + Finnhub
+# root .env is auto-loaded; or export keys yourself
 ./mvnw spring-boot:run
 
 # 3. Frontend  →  http://localhost:5173   (separate terminal)
 cd Frontend
+cp ../.env.example .env   # or: make env
 npm install
 npm run dev
 ```
 
-For the agent, also pull the models once:
+</details>
 
-```bash
-ollama pull llama3
-ollama pull nomic-embed-text
-```
-
-Full walkthrough, Docker Postgres option, and smoke-test curls: [docs/setup.md](docs/setup.md).
+Full walkthrough and smoke-test curls: [docs/setup.md](docs/setup.md). Keys live in root [`.env.example`](.env.example).
 
 ## API at a glance
 
@@ -121,8 +131,9 @@ Full walkthrough, Docker Postgres option, and smoke-test curls: [docs/setup.md](
 | `/post/stock/search/?stockName=` | POST | `200` + posts (may be `[]`) | — |
 | `/post/delete/?postId=&username=` | POST | `204` | `400` / `403` not owner / `404` |
 | `/account/status/` | GET / POST | `200` + visibility | `400` / `404` |
-| `/trade/stock/test/` | GET | `200` + ticker → shares | `503` + `{error}` |
-| `/trade/stock/execute/` | GET | `200` + fills + allowance | `503` + `{error}` |
+| `/trade/stock/test/` | GET | `200` + `RunResult` (paper book + trace) | `503` + `{error}` |
+| `/trade/stock/execute/` | GET | `200` + `RunResult` (fills + trace) | `503` + `{error}` |
+| `/trade/runs/` | GET | `200` + recent run summaries | — |
 
 Full contracts with request/response bodies: [docs/api.md](docs/api.md).
 

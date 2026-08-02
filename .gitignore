@@ -1,4 +1,22 @@
-.DS_STORE
+.DS_Store
 # macOS Finder / iCloud sync duplicate artifacts
 * 2.*
 * 3.*
+
+# Secrets — never commit real keys
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# OS / editor
+.idea/
+.vscode/
+*.iml
+*.swp
+*~
+
+# Logs / local junk
+*.log
+tmp/
+.cache/
