@@ -19,3 +19,9 @@ export async function listAgentRuns() {
   const { data } = await apiFetch('/trade/runs/')
   return Array.isArray(data) ? data : []
 }
+
+/** Full persisted RunResult for a past run (agent desk history). */
+export async function getAgentRun(runId) {
+  const { data } = await apiFetch(`/trade/runs/${encodeURIComponent(runId)}/`)
+  return data && typeof data === 'object' ? data : {}
+}

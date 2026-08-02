@@ -16,6 +16,8 @@ import com.postfolio.postfolio.stockInvestmentAgents.news.NewsScout;
 import com.postfolio.postfolio.stockInvestmentAgents.news.QuoteService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -75,7 +77,7 @@ public class RunSupervisor {
 
             List<Candidate> candidates = bull.propose(headlines);
             result.addTrace("bull", "ok", "Proposed %d candidate(s)".formatted(candidates.size()),
-                    Map.of("tickers", candidates.stream().map(c -> c.ticker).toList()));
+                    bullDetail(candidates));
             if (candidates.isEmpty()) {
                 result.addTrace("supervisor", "stopped", "Bull produced no valid candidates", Map.of());
                 return persist(result, username);
@@ -84,7 +86,7 @@ public class RunSupervisor {
 
             bear.critique(headlines, candidates);
             result.addTrace("bear", "ok", "Critiqued %d candidate(s)".formatted(candidates.size()),
-                    Map.of("risksFound", candidates.stream().mapToInt(c -> c.risks.size()).sum()));
+                    bearDetail(candidates));
             if (timedOut(startedAt, result)) return persist(result, username);
 
             StockJudgeAgent.Verdict verdict = stockJudge.judge(candidates);
@@ -92,7 +94,7 @@ public class RunSupervisor {
             result.rejectedTickers.addAll(verdict.rejected());
             result.addTrace("stock_judge", "ok",
                     "Advanced %d, rejected %d".formatted(verdict.advanced().size(), verdict.rejected().size()),
-                    Map.of("advanced", verdict.advanced().stream().map(c -> c.ticker).toList()));
+                    judgeDetail(verdict));
             if (verdict.advanced().isEmpty()) {
                 result.addTrace("supervisor", "stopped", "No candidates advanced to capital", Map.of());
                 return persist(result, username);
@@ -170,5 +172,45 @@ public class RunSupervisor {
 
     private static double round2(double v) {
         return Math.round(v * 100.0) / 100.0;
+    }
+
+    private static Map<String, Object> bullDetail(List<Candidate> candidates) {
+        List<Map<String, Object>> rows = new ArrayList<>();
+        for (Candidate c : candidates) {
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("ticker", c.ticker);
+            row.put("thesis", c.thesis == null ? "" : c.thesis);
+            row.put("confidence", c.confidence);
+            rows.add(row);
+        }
+        Map<String, Object> detail = new LinkedHashMap<>();
+        detail.put("tickers", candidates.stream().map(c -> c.ticker).toList());
+        detail.put("candidates", rows);
+        detail.put("provider", "groq");
+        return detail;
+    }
+
+    private static Map<String, Object> bearDetail(List<Candidate> candidates) {
+        List<Map<String, Object>> rows = new ArrayList<>();
+        for (Candidate c : candidates) {
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("ticker", c.ticker);
+            row.put("risks", c.risks == null ? List.of() : c.risks);
+            row.put("severityDown", c.severityDown);
+            rows.add(row);
+        }
+        Map<String, Object> detail = new LinkedHashMap<>();
+        detail.put("risksFound", candidates.stream().mapToInt(c -> c.risks == null ? 0 : c.risks.size()).sum());
+        detail.put("critiques", rows);
+        detail.put("provider", "groq");
+        return detail;
+    }
+
+    private static Map<String, Object> judgeDetail(StockJudgeAgent.Verdict verdict) {
+        Map<String, Object> detail = new LinkedHashMap<>();
+        detail.put("advanced", verdict.advanced().stream().map(c -> c.ticker).toList());
+        detail.put("rejected", verdict.rejected());
+        detail.put("provider", "groq");
+        return detail;
     }
 }

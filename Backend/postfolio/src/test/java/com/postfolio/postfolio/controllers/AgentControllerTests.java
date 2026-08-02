@@ -117,4 +117,49 @@ class AgentControllerTests {
                 .andExpect(jsonPath("$[0].username").value("demo"))
                 .andExpect(jsonPath("$[0].resultJson").doesNotExist());
     }
+
+    @Test
+    void getRunReturnsPersistedRunResult() throws Exception {
+        UUID id = UUID.randomUUID();
+        AgentRun run = new AgentRun();
+        run.setId(id);
+        run.setStatus("completed");
+        run.setResultJson("""
+                {"runId":"%s","status":"completed","agentTrace":[{"step":1,"agent":"news_scout","status":"ok","summary":"Fetched 3"}]}
+                """.formatted(id));
+        runRepository.save(run);
+
+        mockMvc.perform(get("/trade/runs/" + id + "/"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("completed"))
+                .andExpect(jsonPath("$.agentTrace[0].agent").value("news_scout"));
+    }
+
+    @Test
+    void getRunUnknownIdReturns404() throws Exception {
+        mockMvc.perform(get("/trade/runs/" + UUID.randomUUID() + "/"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("run not found"));
+    }
+
+    @Test
+    void getRunInvalidIdReturns400() throws Exception {
+        mockMvc.perform(get("/trade/runs/not-a-uuid/"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("invalid run id"));
+    }
+
+    @Test
+    void getRunMissingResultJsonReturns404() throws Exception {
+        UUID id = UUID.randomUUID();
+        AgentRun run = new AgentRun();
+        run.setId(id);
+        run.setStatus("failed");
+        run.setResultJson("");
+        runRepository.save(run);
+
+        mockMvc.perform(get("/trade/runs/" + id + "/"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("run result missing"));
+    }
 }
