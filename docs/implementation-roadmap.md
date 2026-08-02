@@ -1,12 +1,12 @@
-# Plan — what needs to be done
+# Implementation roadmap
 
 **Goal:** Ship a working social investment **web** app: auth, post trades, browse a feed, view LLM agent simulated trades.
 
-**Constraints:** Backend APIs mostly exist; frontend is scaffolding with known bugs; agent needs Ollama + Finnhub; posts not reliably scoped to auth users; no weekly scheduler. Some design questions still open in [open-questions.md](./open-questions.md).
+**Constraints:** Backend APIs mostly exist; frontend is scaffolding with known bugs; agent needs Ollama + Finnhub; posts not reliably scoped to auth users; no weekly scheduler. Some design questions still open in [product-decisions.md](./product-decisions.md).
 
-**Locked for demo:** localStorage auth · Postgres local · signup field set · ranked order below. See open-questions “Locked decisions.”
+**Locked for demo:** localStorage auth · Postgres local · signup field set · ranked order below. See product-decisions “Locked decisions.”
 
-**How to work:** Vertical slices. Each slice demoable. Tests: **1 positive + 3 negative** per behavior (tmestz-skills). Read [frontend.md](./frontend.md) before UI PRs. Stop for approval on large phases unless told to proceed.
+**How to work:** Vertical slices. Each slice demoable. Tests: **1 positive + 3 negative** per behavior (tmestz-skills). Read [frontend-ui-guide.md](./frontend-ui-guide.md) before UI PRs. Stop for approval on large phases unless told to proceed.
 
 ---
 
@@ -39,7 +39,7 @@
   - Datasource URL/user/password via env or documented local defaults
   - `ddl-auto` sensible for demo (`update` OK for local)
   - Entities create/read against Postgres
-  - [setup.md](./setup.md) has `createdb` / Docker one-liner
+  - [local-development.md](./local-development.md) has `createdb` / Docker one-liner
 - **Tests:** App context loads with Postgres; signup row visible in DB; boot fails clearly if Postgres down
 - **Risks:** CI needs Postgres service or testcontainers later
 
@@ -53,11 +53,11 @@
   - Catch-all 404 route registered
   - `VITE_SERVER_URL` via `import.meta.env`
 - **Tests:** 1 signup success; negatives: bad password login, missing fields, malformed email
-- **FE checklist:** [frontend.md](./frontend.md) §§4–5, §11
+- **FE checklist:** [frontend-ui-guide.md](./frontend-ui-guide.md) §§4–5, §11
 
 ### Task 0.2: Config and secrets hygiene
 - **Goal:** Env examples for Postgres, Finnhub, Ollama; no secrets in git.
-- **Likely files:** Spring config, `Frontend/.env.example`, `.gitignore`, [setup.md](./setup.md)
+- **Likely files:** Spring config, `Frontend/.env.example`, `.gitignore`, [local-development.md](./local-development.md)
 - **Done when:** Examples exist; app starts without Finnhub (agent routes fail clearly); `.env` ignored
 - **Tests:** Boot without Finnhub key; agent endpoint actionable error; Vite env fallback
 
@@ -76,7 +76,7 @@
 - **Files:** `Frontend/src/api/`
 - **Done when:** Login/signup use it; forms show inline errors (no `alert`)
 - **Tests:** success parse; network fail; 4xx body; non-JSON 202 text login
-- **See:** [api.md](./api.md), [frontend.md](./frontend.md) §4
+- **See:** [rest-api-contract.md](./rest-api-contract.md), [frontend-ui-guide.md](./frontend-ui-guide.md) §4
 
 ### Task 1.2: localStorage session (LOCKED — not JWT)
 - **Goal:** `postfolio.session`; AuthContext; auto-login after signup; protect `/post/new`, `/agent`, `/account`.
@@ -99,14 +99,14 @@
 
 ### Task 2.2: Feed page
 - **Goal:** Home shows posts from `GET /post/feed/` with empty/error states.
-- **Design:** Follow [frontend.md](./frontend.md) §6–7 — not a widget dashboard
+- **Design:** Follow [frontend-ui-guide.md](./frontend-ui-guide.md) §6–7 — not a widget dashboard
 - **Working assumptions:** global public feed (Q4); soft-product visuals until Q7 answered
 - **Tests:** feed with data; empty; API error; malformed item safe
 
 ### Task 2.3: Search by ticker + delete
 - **Goal:** Search (`POST /post/stock/search/?stockName=`) handles **204**; delete with username/owner check for demo
 - **Tests:** hit; no matches (204); invalid input; delete unauthorized
-- **Risks:** Delete endpoint parameter binding must be fixed first ([api.md](./api.md))
+- **Risks:** Delete endpoint parameter binding must be fixed first ([rest-api-contract.md](./rest-api-contract.md))
 
 ### Task 2.4: Demo post attribution (backend) — Rank 4
 - **Goal:** Create post works **without** JWT: if principal null, resolve user by request `username`.
@@ -178,8 +178,8 @@
 
 - Native mobile apps  
 - GraphQL usage  
-- Comments/likes until networking track ships ([social-network.md](./social-network.md))
-- **Next major track after agent v2:** follows + networked feed + notifications — see [social-network.md](./social-network.md)  
+- Comments/likes until networking track ships ([social-network-design.md](./social-network-design.md))
+- **Next major track after agent v2:** follows + networked feed + notifications — see [social-network-design.md](./social-network-design.md)  
 - Real brokerage execution  
 - JWT / Spring session (demo uses localStorage)  
 
@@ -190,4 +190,4 @@
 3. User can create a post (username bridge) and see it on the feed.  
 4. Feed empty/error states don’t look broken.  
 5. Agent page can show a mocked or live result with loading state.  
-6. UI follows frontend.md (no purple SaaS clone, no alert hell).
+6. UI follows frontend-ui-guide.md (no purple SaaS clone, no alert hell).

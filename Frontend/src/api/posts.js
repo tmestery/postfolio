@@ -10,7 +10,7 @@ export async function getFeed({ username, mode = 'discover' } = {}) {
 
 /**
  * `username` is the demo session bridge — required while the API has no
- * server-side session (see docs/api.md).
+ * server-side session (see docs/rest-api-contract.md).
  */
 export async function createPost({ username, stock, shares, investedAmount, dateInvested }) {
   const { data } = await apiFetch('/post/stock/', {

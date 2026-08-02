@@ -1,4 +1,4 @@
-# API reference (frontend ↔ backend)
+# REST API contract (frontend ↔ backend)
 
 Living contract for the Spring Boot API as it exists today, plus notes on what must change. Frontend agents should treat this as source of truth over guessing from controller comments.
 
@@ -80,7 +80,7 @@ const text = await response.text()
 // do not response.json() unless Content-Type is JSON
 ```
 
-**Gap (demo):** No session cookie, no JWT. SPA uses **localStorage** (`postfolio.session`) — see [open-questions.md](./open-questions.md) / [frontend.md](./frontend.md). Create-post’s `@AuthenticationPrincipal` will not populate; use the **username demo bridge** below.
+**Gap (demo):** No session cookie, no JWT. SPA uses **localStorage** (`postfolio.session`) — see [product-decisions.md](./product-decisions.md) / [frontend-ui-guide.md](./frontend-ui-guide.md). Create-post’s `@AuthenticationPrincipal` will not populate; use the **username demo bridge** below.
 
 ---
 

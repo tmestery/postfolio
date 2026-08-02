@@ -2,7 +2,7 @@
 
 **Status:** Implemented (follows, requests, networked feed, profiles, notifications).  
 **Audience:** Coding agents + humans adding the missing “connections” product layer.  
-**Related:** [architecture.md](./architecture.md) · [api.md](./api.md) · [frontend.md](./frontend.md) · [open-questions.md](./open-questions.md) · [plan.md](./plan.md)
+**Related:** [system-architecture.md](./system-architecture.md) · [rest-api-contract.md](./rest-api-contract.md) · [frontend-ui-guide.md](./frontend-ui-guide.md) · [product-decisions.md](./product-decisions.md) · [implementation-roadmap.md](./implementation-roadmap.md)
 
 ---
 
@@ -47,7 +47,7 @@ Architecture already notes this: *“README mentions connections — follow grap
 
 ## 3. Locked design decisions (proposed)
 
-These close **Q4 (feed model)** for the networking track. Treat as locked once this doc is approved; update [open-questions.md](./open-questions.md) accordingly.
+These close **Q4 (feed model)** for the networking track. Treat as locked once this doc is approved; update [product-decisions.md](./product-decisions.md) accordingly.
 
 | ID | Decision |
 |----|----------|
@@ -145,7 +145,7 @@ Row states: unread (soft accent background) vs read. Actions:
 - **Mark all read** (does **not** auto-accept requests)  
 - Unread count in nav = `GET /notifications/unread-count/`
 
-No cards fetish — same timeline language as the feed ([frontend.md](./frontend.md) §7).
+No cards fetish — same timeline language as the feed ([frontend-ui-guide.md](./frontend-ui-guide.md) §7).
 
 ---
 
@@ -385,7 +385,7 @@ Do **not** notify on Discover browsing. Cap fan-out mentally for demo (hundreds 
 
 ### Visual rules
 
-Still governed by [frontend.md](./frontend.md): one composition, no notification “widget dashboard,” no purple SaaS, timeline over card grids. Badge = small numeric accent, not a pill cluster.
+Still governed by [frontend-ui-guide.md](./frontend-ui-guide.md): one composition, no notification “widget dashboard,” no purple SaaS, timeline over card grids. Badge = small numeric accent, not a pill cluster.
 
 ---
 
@@ -448,7 +448,7 @@ FE                     API                      DB
 Each slice: code + **1 positive + 3 negative** tests + demoable checkpoint. Prefer small PRs.
 
 ### Slice 0 — Design doc (this file)
-- **Done when:** Approved; Q4 updated in open-questions; plan.md links here.
+- **Done when:** Approved; Q4 updated in open-questions; implementation-roadmap.md links here.
 
 ### Slice 1 — Follow entity + public follow API
 - **Goal:** Persist edges with `status`; public follow / unfollow / status / lists.  
@@ -481,7 +481,7 @@ Each slice: code + **1 positive + 3 negative** tests + demoable checkpoint. Pref
 - **Tests:** tab empty state; badge count; accept from inbox; guest cannot open `/notifications`.
 
 ### Slice 6 — Docs cleanup
-- Update api.md, architecture.md, frontend.md §6, README social pillar, plan.md checklist.
+- Update rest-api-contract.md, system-architecture.md, frontend-ui-guide.md §6, README social pillar, implementation-roadmap.md checklist.
 
 ---
 
@@ -528,8 +528,8 @@ Each slice: code + **1 positive + 3 negative** tests + demoable checkpoint. Pref
 ## 13. Reading order for implementers
 
 1. This document (§3–§6 especially)  
-2. [frontend.md](./frontend.md) before any UI  
-3. [api.md](./api.md) — update as slices land  
+2. [frontend-ui-guide.md](./frontend-ui-guide.md) before any UI  
+3. [rest-api-contract.md](./rest-api-contract.md) — update as slices land  
 4. Existing `PostService` / `PostCard` / `Layout` — extend, don’t fork a second feed stack  
 
 **Do not implement until this design is approved** (or the user says to proceed).

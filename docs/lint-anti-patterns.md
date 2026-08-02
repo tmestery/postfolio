@@ -1,4 +1,4 @@
-# Anti-linter patterns
+# Lint anti-patterns
 
 Patterns that create false-green CI, hide bugs, or fight the toolchain. Agents and humans should avoid these.
 

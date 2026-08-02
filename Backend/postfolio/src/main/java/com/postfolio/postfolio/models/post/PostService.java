@@ -56,7 +56,7 @@ public class PostService {
         post.setPricePerShare(shares > 0 ? investedAmount / shares : 0);
         Post saved = repository.save(post);
 
-        // Fan-out to accepted followers only (docs/social-network.md §6.5).
+        // Fan-out to accepted followers only (docs/social-network-design.md §6.5).
         for (WebUser follower : followService.acceptedFollowers(user)) {
             notificationService.create(
                     follower,

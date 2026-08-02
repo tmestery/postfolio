@@ -1,4 +1,4 @@
-# Frontend guide (read this before touching UI)
+# Frontend UI guide (read this before touching UI)
 
 **Audience:** humans and coding agents. Frontend work is where agents most often go wrong — follow this doc literally. If something here conflicts with a skill or habit, **this doc wins**.
 
@@ -6,7 +6,7 @@
 
 **Product:** Postfolio is a **web app** (responsive browser). Not React Native, not Capacitor, not a “mobile-first app shell.” Design for desktop first, then make narrow viewports work.
 
-Related docs: [architecture.md](./architecture.md) · [api.md](./api.md) · [plan.md](./plan.md) · [open-questions.md](./open-questions.md)
+Related docs: [system-architecture.md](./system-architecture.md) · [rest-api-contract.md](./rest-api-contract.md) · [implementation-roadmap.md](./implementation-roadmap.md) · [product-decisions.md](./product-decisions.md)
 
 ---
 
@@ -112,7 +112,7 @@ Never commit real secrets. Frontend should not hold Finnhub/Groq keys.
 5. Surface user-visible errors in the form UI — **no `alert()`** for product flows.
 6. CORS is locked to `http://localhost:5173` with credentials allowed. If using cookies later, set `credentials: 'include'`.
 
-See [api.md](./api.md) for request/response shapes.
+See [rest-api-contract.md](./rest-api-contract.md) for request/response shapes.
 
 ---
 
@@ -125,7 +125,7 @@ This project is **demo-only**. Do **not** build JWT or cookie sessions unless th
 - Login: `POST /credentials/login/` → `202` + **plain-text** username, or `400` + `"Failed!"`
 - Signup: `POST /credentials/signup/` → `200` + `WebUser` JSON (includes `id`)
 - Spring Security permits `/credentials/**` and `/post/**` without auth
-- `@AuthenticationPrincipal` on create-post is usually **null** — use the **demo username bridge** (send `username` from localStorage; backend resolves user). See [api.md](./api.md).
+- `@AuthenticationPrincipal` on create-post is usually **null** — use the **demo username bridge** (send `username` from localStorage; backend resolves user). See [rest-api-contract.md](./rest-api-contract.md).
 
 ### localStorage session (required)
 
@@ -208,7 +208,7 @@ Rules:
 ### Create post (`/post/new`)
 
 - Authed only (localStorage).
-- Fields: `stock`, `shares`, `investedAmount`, `dateInvested` (`yyyy-MM-DD`), plus demo bridge field `username` from session (or header — match [api.md](./api.md)).
+- Fields: `stock`, `shares`, `investedAmount`, `dateInvested` (`yyyy-MM-DD`), plus demo bridge field `username` from session (or header — match [rest-api-contract.md](./rest-api-contract.md)).
 - Client-side: ticker uppercase; shares > 0; amount > 0; date not in the future.
 - Success → navigate to feed and refetch.
 
@@ -217,10 +217,10 @@ Rules:
 - Authed only (localStorage). Shared house agent for demo.
 - Trigger research: `GET /trade/stock/test/` → `RunResult` (paper book + `agentTrace`, no fills).
 - Execute: `GET /trade/stock/execute/` → full `RunResult` with fills + capital panel data.
-- **Sell the architecture:** pipeline rail of spawned agents (LLM / API / rules), expandable `agentTrace[]` detail, bull/bear debate board, quote strip, capital committee (3 allocators + Cash Guard + judge), fills/paper book (see [agent-trader-v2.md](./agent-trader-v2.md) §9).
-- History: `GET /trade/runs/` summaries; click → `GET /trade/runs/{id}/` full result.
-- Calls can take **tens of seconds** (multi-agent Groq). Mandatory: loading state with live pipeline progress, leave-page messaging, never block the shell without feedback.
-- Detailed, but not a trading-terminal parody — one vertical narrative, expand for depth.
+- **Single desk window** (fixed height, internal scroll): compact pipeline chips + live spawn feed; debate / quotes / capital / fills append in the same window. **No call-trace inspector** (see [agent-trader-v3.md](./agent-trader-v3.md) §6).
+- History: `GET /trade/runs/` summaries; click → load into the same desk window.
+- Calls can take **tens of seconds** (multi-agent Groq). Mandatory: live progress in-window, leave-page messaging, never block the shell without feedback.
+- Data ingress is moving off Finnhub to a multi-agent web research crew ([agent-trader-v3.md](./agent-trader-v3.md)).
 
 ### Account
 
@@ -249,7 +249,7 @@ These exist because AI frontends converge on the same generic look. **Avoid** th
 
 - Define CSS variables in `index.css` (background, surface, text, muted, accent, danger, border, font-display, font-body).
 - **Do not** default to: purple-on-white / purple→indigo gradients; warm cream `#F4F1EA` + terracotta + serif; broadsheet hairline newspaper layouts; dark-mode-by-default; glow effects; `rounded-full` pill clusters; multi-layer shadows; emoji as decoration.
-- Prefer a clear direction once chosen in [open-questions.md](./open-questions.md). Until then, use a restrained light theme with a single accent and strong typography — document the chosen tokens in this file when decided.
+- Prefer a clear direction once chosen in [product-decisions.md](./product-decisions.md). Until then, use a restrained light theme with a single accent and strong typography — document the chosen tokens in this file when decided.
 - Backgrounds: subtle gradient or soft texture OK; flat pure white/gray only is weak; abstract gradient ≠ “the” visual idea for a marketing hero.
 
 ### Typography
@@ -320,7 +320,7 @@ Typography hierarchy > boxed chrome.
 
 ## 10. Implementation checklist (every FE PR)
 
-- [ ] Touches only the slice in [plan.md](./plan.md)
+- [ ] Touches only the slice in [implementation-roadmap.md](./implementation-roadmap.md)
 - [ ] Uses `VITE_*` + `SERVER_URL` helper
 - [ ] Loading + empty + error states for async views
 - [ ] No `alert()`
