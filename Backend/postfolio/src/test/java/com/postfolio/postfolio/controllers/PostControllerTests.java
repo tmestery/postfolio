@@ -104,6 +104,52 @@ class PostControllerTests {
                 .andExpect(jsonPath("$.error").value(containsString("shares")));
     }
 
+    @Test
+    void createPostRejectsUnknownTicker() throws Exception {
+        createUser("tickerguy", true);
+
+        mockMvc.perform(post("/post/stock/")
+                        .contentType(APPLICATION_JSON)
+                        .content(createPostBody("tickerguy", "NOTAREALTICKER", 1.0, 100.0)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value(containsString("unknown stock ticker")));
+    }
+
+    @Test
+    void createPostRejectsBlankTicker() throws Exception {
+        createUser("blankticker", true);
+
+        mockMvc.perform(post("/post/stock/")
+                        .contentType(APPLICATION_JSON)
+                        .content(createPostBody("blankticker", "   ", 1.0, 100.0)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value(containsString("stock ticker")));
+    }
+
+    // --- symbols ---
+
+    @Test
+    void symbolsSearchReturnsPrefixMatches() throws Exception {
+        mockMvc.perform(get("/post/symbols/").param("q", "AA"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].symbol").value("AAPL"))
+                .andExpect(jsonPath("$[0].name").value(containsString("Apple")));
+    }
+
+    @Test
+    void symbolsSearchEmptyQueryReturnsEmptyList() throws Exception {
+        mockMvc.perform(get("/post/symbols/").param("q", ""))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    void symbolsSearchUnknownPrefixReturnsEmptyList() throws Exception {
+        mockMvc.perform(get("/post/symbols/").param("q", "ZZZZZ"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
+
     // --- feed ---
 
     @Test

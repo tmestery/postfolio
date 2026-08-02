@@ -28,6 +28,14 @@ export async function searchPosts(stockName) {
   return Array.isArray(data) ? data : []
 }
 
+/** Prefix search over allowed tickers for create-post typeahead. */
+export async function searchSymbols(query, limit = 20) {
+  const q = (query ?? '').trim()
+  if (!q) return []
+  const { data } = await apiFetch('/post/symbols/', { params: { q, limit } })
+  return Array.isArray(data) ? data : []
+}
+
 export async function deletePost({ postId, username }) {
   await apiFetch('/post/delete/', { method: 'POST', params: { postId, username } })
 }

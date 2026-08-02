@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import com.postfolio.postfolio.models.post.Post;
 import com.postfolio.postfolio.models.post.PostService;
+import com.postfolio.postfolio.models.symbol.StockSymbol;
+import com.postfolio.postfolio.models.symbol.StockSymbolService;
 import com.postfolio.postfolio.models.user.UserRepository;
 import com.postfolio.postfolio.models.user.WebUser;
 
@@ -25,10 +27,13 @@ public class postController {
 
     private final UserRepository userRepository;
     private final PostService postService;
+    private final StockSymbolService stockSymbolService;
 
-    public postController(PostService postService, UserRepository userRepository) {
+    public postController(PostService postService, UserRepository userRepository,
+                          StockSymbolService stockSymbolService) {
         this.postService = postService;
         this.userRepository = userRepository;
+        this.stockSymbolService = stockSymbolService;
     }
 
     public static class StockPostRequest {
@@ -78,6 +83,11 @@ public class postController {
         if (request.stock == null || request.stock.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("error", "stock ticker is required"));
         }
+        String ticker = stockSymbolService.normalize(request.stock);
+        if (!stockSymbolService.isKnown(ticker)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "unknown stock ticker: " + ticker));
+        }
         if (request.shares == null || request.shares <= 0) {
             return ResponseEntity.badRequest().body(Map.of("error", "shares must be greater than 0"));
         }
@@ -85,13 +95,29 @@ public class postController {
             return ResponseEntity.badRequest().body(Map.of("error", "investedAmount must be greater than 0"));
         }
 
-        Post post = postService.createPost(
-                author,
-                request.dateInvested,
-                request.stock.trim().toUpperCase(),
-                request.shares,
-                request.investedAmount);
-        return new ResponseEntity<>(post, HttpStatus.CREATED);
+        try {
+            Post post = postService.createPost(
+                    author,
+                    request.dateInvested,
+                    ticker,
+                    request.shares,
+                    request.investedAmount);
+            return new ResponseEntity<>(post, HttpStatus.CREATED);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        }
+    }
+
+    /**
+     * GET http://localhost:8080/post/symbols/?q=AA
+     *
+     * Prefix search over the allowed ticker book (for create-post typeahead).
+     */
+    @GetMapping("/symbols/")
+    public ResponseEntity<List<StockSymbol>> searchSymbols(
+            @RequestParam(required = false, defaultValue = "") String q,
+            @RequestParam(required = false, defaultValue = "20") int limit) {
+        return ResponseEntity.ok(stockSymbolService.search(q, limit));
     }
 
     /**

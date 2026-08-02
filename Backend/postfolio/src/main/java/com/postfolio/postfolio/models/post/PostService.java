@@ -2,6 +2,7 @@ package com.postfolio.postfolio.models.post;
 
 import com.postfolio.postfolio.models.follow.FollowService;
 import com.postfolio.postfolio.models.notification.NotificationService;
+import com.postfolio.postfolio.models.symbol.StockSymbolService;
 import com.postfolio.postfolio.models.user.WebUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,12 +21,15 @@ public class PostService {
     private final PostRepository repository;
     private final FollowService followService;
     private final NotificationService notificationService;
+    private final StockSymbolService stockSymbolService;
 
     public PostService(PostRepository repository, FollowService followService,
-                       NotificationService notificationService) {
+                       NotificationService notificationService,
+                       StockSymbolService stockSymbolService) {
         this.repository = repository;
         this.followService = followService;
         this.notificationService = notificationService;
+        this.stockSymbolService = stockSymbolService;
     }
 
     public List<Post> getPostsByStock(String stock) {
@@ -34,11 +38,19 @@ public class PostService {
 
     @Transactional
     public Post createPost(WebUser user, LocalDate dateInvested, String stock, Double shares, Double investedAmount) {
+        String ticker = stockSymbolService.normalize(stock);
+        if (ticker == null || ticker.isEmpty()) {
+            throw new IllegalArgumentException("stock ticker is required");
+        }
+        if (!stockSymbolService.isKnown(ticker)) {
+            throw new IllegalArgumentException("unknown stock ticker: " + ticker);
+        }
+
         Post post = new Post();
         post.setUser(user);
         post.setDateInvested(dateInvested);
         post.setCreatedAt(LocalDateTime.now());
-        post.setStock(stock);
+        post.setStock(ticker);
         post.setShares(shares);
         post.setInvestedAmount(investedAmount);
         post.setPricePerShare(shares > 0 ? investedAmount / shares : 0);
@@ -50,7 +62,7 @@ public class PostService {
                     follower,
                     user,
                     "followed_post",
-                    "@" + user.getUsername() + " posted " + stock,
+                    "@" + user.getUsername() + " posted " + ticker,
                     saved,
                     null);
         }
