@@ -40,16 +40,13 @@ export default function NewPostPage() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [suggestions, setSuggestions] = useState([])
+  const tickerQuery = form.stock.trim()
 
   useEffect(() => {
-    const q = form.stock.trim()
-    if (q.length < 1) {
-      setSuggestions([])
-      return undefined
-    }
+    if (tickerQuery.length < 1) return undefined
     let cancelled = false
     const handle = setTimeout(() => {
-      searchSymbols(q)
+      searchSymbols(tickerQuery)
         .then((rows) => {
           if (!cancelled) setSuggestions(rows)
         })
@@ -61,7 +58,9 @@ export default function NewPostPage() {
       cancelled = true
       clearTimeout(handle)
     }
-  }, [form.stock])
+  }, [tickerQuery])
+
+  const tickerSuggestions = tickerQuery.length < 1 ? [] : suggestions
 
   function update(key) {
     return (event) => setForm({ ...form, [key]: event.target.value })
@@ -116,7 +115,7 @@ export default function NewPostPage() {
           required
         />
         <datalist id="ticker-suggestions">
-          {suggestions.map((row) => (
+          {tickerSuggestions.map((row) => (
             <option key={row.symbol} value={row.symbol}>
               {row.name}
             </option>

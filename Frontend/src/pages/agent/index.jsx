@@ -487,10 +487,9 @@ export default function AgentPage() {
   // the desk feels alive even without streaming.
   useEffect(() => {
     if (status !== 'running') return undefined
-    setLiveTrace([])
     const expected = buildPipelineView([], { running: true, mode: mode ?? 'execute' })
     let i = 0
-    const interval = setInterval(() => {
+    const tick = () => {
       i += 1
       setLiveTrace(
         expected.slice(0, Math.min(i, expected.length)).map((stage, idx) => ({
@@ -501,8 +500,13 @@ export default function AgentPage() {
           detail: {},
         })),
       )
-    }, 2200)
-    return () => clearInterval(interval)
+    }
+    const immediate = setTimeout(tick, 0)
+    const interval = setInterval(tick, 2200)
+    return () => {
+      clearTimeout(immediate)
+      clearInterval(interval)
+    }
   }, [status, mode])
 
   async function run(nextMode) {
@@ -511,6 +515,7 @@ export default function AgentPage() {
     setStatus('running')
     setResult(null)
     setError('')
+    setLiveTrace([])
     setStartedAt(Date.now())
     const username = user?.username
     try {
