@@ -1,13 +1,15 @@
 package com.postfolio.postfolio.controllers;
 
+import com.postfolio.postfolio.stockInvestmentAgents.AgentUnavailableException;
 import com.postfolio.postfolio.stockInvestmentAgents.managerAgents.manager;
 import com.postfolio.postfolio.stockInvestmentAgents.managerAgents.executeAgent;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 @RestController
 @RequestMapping("/trade")
@@ -21,35 +23,36 @@ public class longTermStockController {
     }
 
     /**
-     * GET http://localhost:8080/trade/stock/llm/
+     * GET http://localhost:8080/trade/stock/test/
      *
-     * @return a map of stocks + shares
+     * Runs the research pipeline (Finnhub news + Ollama RAG analysis).
+     *
+     * @return 200 + map of ticker -> shares, or 503 when a dependency is down
      */
     @GetMapping("/stock/test/")
     public Map<String, Double> agentStockInvesting() {
-//        System.out.println("Initializing Agents!");
-//        return manage.deployAgents();
         long start = System.currentTimeMillis();
-
-        System.out.println("Initializing Agents!");
-
         Map<String, Double> result = manage.deployAgents();
-
         long duration = System.currentTimeMillis() - start;
         System.out.println("Agent workflow completed in " + duration + " ms");
-
         return result;
     }
 
     /**
      * GET http://localhost:8080/trade/stock/execute/
      *
-     * @return a map of stock + shares + cost + price paid as
-     * well as allowance data (total invested, remaining allowance)
+     * @return 200 + executed trades (shares, price, cost) plus allowance
+     *         totals, or 503 when a dependency is down
      */
     @GetMapping("/stock/execute/")
     public Map<String, Object> executeTrades() {
         Map<String, Double> decisions = manage.deployAgents();
         return execute.executeTrades(decisions, 1000);
+    }
+
+    @ExceptionHandler(AgentUnavailableException.class)
+    public ResponseEntity<Map<String, String>> handleAgentUnavailable(AgentUnavailableException e) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(Map.of("error", e.getMessage()));
     }
 }

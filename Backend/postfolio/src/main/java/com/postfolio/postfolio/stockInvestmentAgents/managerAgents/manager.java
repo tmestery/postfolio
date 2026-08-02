@@ -14,16 +14,25 @@ import com.postfolio.postfolio.stockInvestmentAgents.rag.RetrievedContext;
 @Service
 public class manager {
 
-    private double allowance = 1000;
-    private List<String> stockList = new ArrayList<>();
-    private List<Double> stockSharesAmount = new ArrayList<>();
+    private static final double STARTING_ALLOWANCE = 1000;
+
+    private final dataCollection dataAgent;
+    private final dataAnalyzerAgent sentimentAnalyzeAgent;
+    private final costAnalysisAgent costAnalyzeAgent;
+
+    public manager(dataCollection dataAgent,
+                   dataAnalyzerAgent sentimentAnalyzeAgent,
+                   costAnalysisAgent costAnalyzeAgent) {
+        this.dataAgent = dataAgent;
+        this.sentimentAnalyzeAgent = sentimentAnalyzeAgent;
+        this.costAnalyzeAgent = costAnalyzeAgent;
+    }
 
     public Map<String, Double> deployAgents() {
-
-        // Core agents
-        dataCollection dataAgent = new dataCollection();
-        dataAnalyzerAgent sentimentAnalyzeAgent = new dataAnalyzerAgent();
-        costAnalysisAgent costAnalyzeAgent = new costAnalysisAgent();
+        // Per-run state so repeated runs start from a fresh allowance
+        double allowance = STARTING_ALLOWANCE;
+        List<String> stockList = new ArrayList<>();
+        List<Double> stockSharesAmount = new ArrayList<>();
 
         // RAG components
         EmbeddingService embeddingService = new EmbeddingService();
@@ -85,7 +94,7 @@ public class manager {
 
         // Build result map
         Map<String, Double> result = new HashMap<>();
-        for (int i = 0; i < stockList.size(); i++) {
+        for (int i = 0; i < stockList.size() && i < stockSharesAmount.size(); i++) {
             result.put(stockList.get(i), stockSharesAmount.get(i));
         }
 

@@ -201,13 +201,17 @@ Runs LLM agent pipeline (`manager.deployAgents()`).
 
 Values = share counts (doubles). Requires Finnhub + Ollama.
 
+**Failure:** `503` + `{"error": "..."}` when `FINNHUB_API_KEY` is missing, Finnhub is unreachable/returns nothing, or Ollama is down (message says which).
+
 ### `GET /trade/stock/execute/`
 
-Re-runs decisions then prices them (`executeAgent`) with allowance `1000`.
+Re-runs decisions then prices them (`executeAgent`) with allowance `1000`. Repeatable — no one-shot lockout.
 
-**Response:** `200` + `Map<String, Object>` including trade details and allowance fields (shape defined in `executeAgent` — treat as loosely typed; render keys defensively).
+**Response:** `200` + `Map<String, Object>` with `executedTrades` (ticker → `{shares, price, cost}`), `totalInvested`, `remainingAllowance`.
 
-**Frontend:** Always defensive render (`Object.entries`, check typeof). Never assume nested schema until we freeze a DTO.
+**Failure:** `503` + `{"error": "..."}` (same dependency checks as research).
+
+**Frontend:** Always defensive render (`Object.entries`, check typeof).
 
 ---
 
@@ -222,14 +226,14 @@ Re-runs decisions then prices them (`executeAgent`) with allowance `1000`.
 | search | 200 + array (may be empty) | 500 |
 | delete | 204 | 400 / 403 / 404 |
 | account status | 200 + status JSON | 400 / 404 |
-| trade test/execute | 200 + map | 500 if Ollama/Finnhub down |
+| trade test/execute | 200 + map | 503 + `{error}` if Ollama/Finnhub down or key missing |
 
 ---
 
 ## Remaining backend follow-ups
 
-1. Agent: stable response DTO + clear error when Ollama/Finnhub unavailable (Phase 3.1).
+None on the demo path.
 
-**Done:** Postgres datasource · username demo bridge · 409 duplicates · search `200 + []` · delete params + owner check · account status GET/POST · password write-only · ISO dates.
+**Done:** Postgres datasource · username demo bridge · 409 duplicates · search `200 + []` · delete params + owner check · account status GET/POST · password write-only · ISO dates · agent 503s with clear dependency errors.
 
 **Out of scope for this demo:** JWT, Spring session cookies, real security hardening — unless requested later.

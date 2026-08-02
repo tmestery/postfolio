@@ -11,17 +11,9 @@ public class executeAgent {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final String apiKey = System.getenv("FINNHUB_API_KEY");
-    private boolean executed = false;
 
     // Returns a map with stock, shares, and price as well as the allowance (remaining + invested amount)
-    public synchronized Map<String, Object> executeTrades(Map<String, Double> stockShares, double allowance) {
-        if (executed) {
-            return Map.of(
-                    "error", "Trades already completed..."
-            );
-        }
-        executed = true;
-
+    public Map<String, Object> executeTrades(Map<String, Double> stockShares, double allowance) {
         Map<String, Object> response = new HashMap<>();
         Map<String, Map<String, Double>> executedTrades = new HashMap<>();
 
