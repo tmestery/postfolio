@@ -12,15 +12,17 @@
 
 ## Ranked order (execute in this sequence)
 
-1. Postgres local + Spring datasource  
-2. Signup/login FE fixes + API client + `VITE_*` + 404  
-3. AuthContext + `postfolio.session` localStorage (+ auto-login after signup)  
-4. Demo post attribution (API resolves user by `username` when no principal)  
-5. Feed UI  
-6. Create post UI  
-7. Agent UI  
-8. Search / delete / account privacy  
-9. CI JDK 21, polish, security theater only if asked  
+1. ✅ Postgres local + Spring datasource  
+2. ✅ Signup/login FE fixes + API client + `VITE_*` + 404  
+3. ✅ AuthContext + `postfolio.session` localStorage (+ auto-login after signup)  
+4. ✅ Demo post attribution (API resolves user by `username` when no principal)  
+5. ✅ Feed UI  
+6. ✅ Create post UI  
+7. ✅ Agent UI  
+8. ✅ Search / delete / account privacy  
+9. ✅ CI (JDK 21 + frontend lint/test/build job)  
+
+**Remaining:** Phase 3.1 agent hardening (structured errors when Ollama/Finnhub down) and Phase 4 polish as needed.
 
 ---
 

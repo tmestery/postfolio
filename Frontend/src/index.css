@@ -1,1 +1,30 @@
-@import 'tailwindcss'
+@import 'tailwindcss';
+
+@theme {
+  /* Postfolio palette — warm paper, ink text, deep market green accent */
+  --color-paper: #faf9f6;
+  --color-surface: #ffffff;
+  --color-ink: #1c1d1f;
+  --color-muted: #6e6a61;
+  --color-line: #e7e4dc;
+  --color-accent: #1e6b4f;
+  --color-accent-deep: #14503a;
+  --color-accent-soft: #e7f0eb;
+  --color-danger: #b3261e;
+  --color-danger-soft: #f9e9e8;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-sans: 'Instrument Sans', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background-color: var(--color-accent-soft);
+}

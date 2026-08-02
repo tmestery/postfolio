@@ -10,20 +10,18 @@ Related docs: [architecture.md](./architecture.md) · [api.md](./api.md) · [pla
 
 ---
 
-## 1. Current state (honest)
+## 1. Current state
 
 | Area | Reality |
 |------|---------|
-| Pages | `home`, `login`, `signup`, `notfound` — mostly stubs |
-| Signup | Form posts to **wrong URL** (`http://8080/...` missing host; also hits **login** not signup) |
-| Login | Heading says “Create your account”; inputs commented out |
-| Home | `<h1>Home page</h1>` only |
-| Routes | 404 page imported but **not registered** |
-| API helpers | `src/api/constants.js` uses `process.env.*` — **wrong for Vite** (needs `import.meta.env.VITE_*`) |
-| Design system | None. Only `@import 'tailwindcss'` in `index.css` |
-| Auth persistence | **Decided:** demo `localStorage` session (`postfolio.session`) — see §5 |
+| Pages | `home` (guest hero + authed feed), `login`, `signup`, `newpost`, `agent`, `account`, `notfound` — all implemented |
+| API helpers | `src/api/` — `client.js` fetch wrapper + per-domain helpers; `constants.js` uses `import.meta.env.VITE_*` |
+| Auth | `src/auth/` — `session.js` (localStorage `postfolio.session`), `AuthContext.jsx`, `useAuth.js` |
+| Routes | All registered in `routes.jsx` incl. `path="*"` 404; `/post/new`, `/agent`, `/account` behind `RequireAuth` |
+| Design tokens | In `index.css` `@theme` — see §12 for the actual values |
+| Tests | Vitest (jsdom) — `npm test`; see `src/api/client.test.js`, `src/auth/session.test.js`, `src/app.test.jsx` |
 
-**Do not** build a full design system rewrite before auth + feed work. Ship thin vertical slices (see plan). **Do** establish tokens + layout conventions in the first real UI slice so pages don’t diverge.
+The historical bugs listed in §11 are fixed — the table is kept as a regression checklist.
 
 ---
 
@@ -331,38 +329,45 @@ Typography hierarchy > boxed chrome.
 
 ---
 
-## 11. Known bugs to fix first (Phase 0 / 1)
+## 11. Historical bugs (all fixed — do not reintroduce)
 
 | Bug | File | Fix |
 |-----|------|-----|
-| Signup URL `http://8080/...` | `pages/signup` | Use `SERVER_URL` |
-| Signup calls `/credentials/login/` | `pages/signup` | Call `/credentials/signup/` |
-| Snake_case body fields | `pages/signup` | camelCase matching `WebUser` |
-| Login heading wrong | `pages/login` | Login copy + working inputs |
-| `process.env` in Vite | `api/constants.js` | `import.meta.env.VITE_*` |
-| 404 not routed | `routes.jsx` | Add `path="*"` |
-| Invalid Tailwind (`w-200`, `text-large`) | login/signup | Replace with real utilities / tokens |
+| Signup URL `http://8080/...` | `pages/signup` | ✅ Uses `SERVER_URL` via `api/auth.js` |
+| Signup calls `/credentials/login/` | `pages/signup` | ✅ Calls `/credentials/signup/` |
+| Snake_case body fields | `pages/signup` | ✅ camelCase matching `WebUser` |
+| Login heading wrong | `pages/login` | ✅ Login copy + working inputs |
+| `process.env` in Vite | `api/constants.js` | ✅ `import.meta.env.VITE_*` |
+| 404 not routed | `routes.jsx` | ✅ `path="*"` registered |
+| Invalid Tailwind (`w-200`, `text-large`) | login/signup | ✅ Real utilities + tokens |
 
 ---
 
-## 12. When design tokens are chosen
+## 12. Design tokens (chosen — “soft product” direction, Q7 working assumption)
 
-Update this section with the actual values (do not leave “TBD” in code):
+Direction: light warm theme, one deep market-green accent, serif display type. No purple gradients, no dark-SaaS clone. Fonts load from Google Fonts in `index.html`: **Fraunces** (display) + **Instrument Sans** (body).
+
+Actual values in `src/index.css`:
 
 ```css
-/* index.css — example shape only; replace when brand is decided */
 @import 'tailwindcss';
 
 @theme {
-  --color-background: ...;
-  --color-surface: ...;
-  --color-text: ...;
-  --color-muted: ...;
-  --color-accent: ...;
-  --color-danger: ...;
-  --font-display: ...;
-  --font-body: ...;
+  --color-paper: #faf9f6;      /* page background */
+  --color-surface: #ffffff;    /* inputs, raised surfaces */
+  --color-ink: #1c1d1f;        /* primary text */
+  --color-muted: #6e6a61;      /* secondary text */
+  --color-line: #e7e4dc;       /* borders/dividers */
+  --color-accent: #1e6b4f;     /* brand green — buttons, links */
+  --color-accent-deep: #14503a;/* hover state */
+  --color-accent-soft: #e7f0eb;/* tinted backgrounds */
+  --color-danger: #b3261e;
+  --color-danger-soft: #f9e9e8;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-sans: 'Instrument Sans', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace; /* tickers */
 }
 ```
 
-Record the decision in [open-questions.md](./open-questions.md) (mark answered) and paste final tokens here.
+Usage rules: tickers always `font-mono font-bold`; dollar amounts in `text-accent-deep`; headings `font-display`; body defaults to `font-sans` via `body` styles. If the palette changes, update this section and `index.css` together.

@@ -1,12 +1,10 @@
-import { useState } from 'react'
 import Routes from './routes.jsx'
+import { AuthProvider } from './auth/AuthContext'
 
-function App() {
+export default function App() {
   return (
-    <>
+    <AuthProvider>
       <Routes />
-    </>
+    </AuthProvider>
   )
 }
-
-export default App

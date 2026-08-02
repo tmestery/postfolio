@@ -1,21 +1,54 @@
-import {BrowserRouter, Routes as BrowserRoutes, Route} from 'react-router-dom'
-
+import { BrowserRouter, Routes as BrowserRoutes, Route, Navigate } from 'react-router-dom'
+import { useAuth } from './auth/useAuth'
+import Layout from './components/Layout'
 import HomePage from './pages/home'
 import LoginPage from './pages/login'
 import SignupPage from './pages/signup'
+import NewPostPage from './pages/newpost'
+import AgentPage from './pages/agent'
+import AccountPage from './pages/account'
 import NotFoundPage from './pages/notfound'
 
-export default function Routes(){
+function RequireAuth({ children }) {
+  const { isAuthenticated } = useAuth()
+  return isAuthenticated ? children : <Navigate to="/login" replace />
+}
 
-    return(
-        <BrowserRouter>
-            <BrowserRoutes>
-                <Route path="/" element={<HomePage />}/>
-                <Route path="/login" element={<LoginPage />}/>
-                <Route path="/signup" element={<SignupPage />}/>
-
-
-            </BrowserRoutes>
-        </BrowserRouter>
-    )
+export default function Routes() {
+  return (
+    <BrowserRouter>
+      <Layout>
+        <BrowserRoutes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route
+            path="/post/new"
+            element={
+              <RequireAuth>
+                <NewPostPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/agent"
+            element={
+              <RequireAuth>
+                <AgentPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/account"
+            element={
+              <RequireAuth>
+                <AccountPage />
+              </RequireAuth>
+            }
+          />
+          <Route path="*" element={<NotFoundPage />} />
+        </BrowserRoutes>
+      </Layout>
+    </BrowserRouter>
+  )
 }
