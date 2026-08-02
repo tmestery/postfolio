@@ -185,7 +185,7 @@ postfolio/
 | [docs/product-decisions.md](docs/product-decisions.md) | Locked decisions + open product questions |
 | [docs/social-network-design.md](docs/social-network-design.md) | Follows, networked feed, notifications (design) |
 | [docs/agent-trader-v2.md](docs/agent-trader-v2.md) | Multi-agent trader design |
-| [docs/agent-trader-v3.md](docs/agent-trader-v3.md) | Plan: web research (no Finnhub) |
+| [docs/agent-trader-v3.md](docs/agent-trader-v3.md) | Implemented: web research (no Finnhub) |
 | [docs/agent-trader-v4.md](docs/agent-trader-v4.md) | Plan: paper portfolio P&L |
 
 Coding agents start at [`AGENTS.md`](AGENTS.md).

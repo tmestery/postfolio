@@ -20,7 +20,7 @@ help:
 env:
 	@test -f .env || cp .env.example .env
 	@test -f Frontend/.env || (grep -E '^(VITE_|#)' .env.example > Frontend/.env && echo "Wrote Frontend/.env")
-	@echo "Edit .env and put GROQ_API_KEY / FINNHUB_API_KEY there."
+	@echo "Edit .env and put GROQ_API_KEY there."
 
 up: env
 	docker compose up --build

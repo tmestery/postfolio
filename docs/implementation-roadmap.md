@@ -2,7 +2,7 @@
 
 **Goal:** Ship a working social investment **web** app: auth, post trades, browse a feed, view LLM agent simulated trades.
 
-**Constraints:** Backend APIs mostly exist; frontend is scaffolding with known bugs; agent needs Ollama + Finnhub; posts not reliably scoped to auth users; no weekly scheduler. Some design questions still open in [product-decisions.md](./product-decisions.md).
+**Constraints:** Backend APIs mostly exist; frontend is scaffolding with known bugs; agent needs `GROQ_API_KEY` (web research + Yahoo quotes — see [agent-trader-v3.md](./agent-trader-v3.md)); posts not reliably scoped to auth users; no weekly scheduler. Some design questions still open in [product-decisions.md](./product-decisions.md).
 
 **Locked for demo:** localStorage auth · Postgres local · signup field set · ranked order below. See product-decisions “Locked decisions.”
 

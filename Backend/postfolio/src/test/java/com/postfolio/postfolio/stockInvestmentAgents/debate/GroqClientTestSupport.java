@@ -4,13 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /** Shared helper for feeding canned JSON to mocked GroqClients. */
-final class GroqClientTestSupport {
+public final class GroqClientTestSupport {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private GroqClientTestSupport() {}
 
-    static JsonNode parse(String json) {
+    public static JsonNode parse(String json) {
         try {
             return MAPPER.readTree(json);
         } catch (Exception e) {

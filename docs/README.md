@@ -7,7 +7,7 @@ Start here depending on the job:
 | **[frontend-ui-guide.md](./frontend-ui-guide.md)** | **Required before any UI work** — structure, design rules, auth UX, anti-patterns |
 | **[product-decisions.md](./product-decisions.md)** | **Locked decisions** + remaining open questions |
 | **[agent-trader-v2.md](./agent-trader-v2.md)** | Multi-agent trader (current Groq pipeline) |
-| **[agent-trader-v3.md](./agent-trader-v3.md)** | Plan: drop Finnhub → web research crew |
+| **[agent-trader-v3.md](./agent-trader-v3.md)** | **Implemented:** web research crew (no Finnhub) |
 | **[agent-trader-v4.md](./agent-trader-v4.md)** | Plan: paper portfolio P&L tracking |
 | **[social-network-design.md](./social-network-design.md)** | Follows, networked feed, profiles, notifications (design) |
 | [implementation-roadmap.md](./implementation-roadmap.md) | Ranked roadmap — vertical slices with done criteria |

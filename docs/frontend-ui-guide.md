@@ -101,7 +101,7 @@ VITE_SERVER_URL=http://localhost:8080
 VITE_CLIENT_URL=http://localhost:5173
 ```
 
-Never commit real secrets. Frontend should not hold Finnhub/Groq keys.
+Never commit real secrets. Frontend should not hold Groq (or any market-data) keys.
 
 ### Fetch rules
 
@@ -220,7 +220,7 @@ Rules:
 - **Single desk window** (fixed height, internal scroll): compact pipeline chips + live spawn feed; debate / quotes / capital / fills append in the same window. **No call-trace inspector** (see [agent-trader-v3.md](./agent-trader-v3.md) §6).
 - History: `GET /trade/runs/` summaries; click → load into the same desk window.
 - Calls can take **tens of seconds** (multi-agent Groq). Mandatory: live progress in-window, leave-page messaging, never block the shell without feedback.
-- Data ingress is moving off Finnhub to a multi-agent web research crew ([agent-trader-v3.md](./agent-trader-v3.md)).
+- Data ingress is the v3 research crew (public scrape + Yahoo quotes); see [agent-trader-v3.md](./agent-trader-v3.md).
 
 ### Account
 
