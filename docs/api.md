@@ -15,9 +15,9 @@ Authn on `/credentials/**`, `/post/**`, `/trade/**`: **permitAll** (not actually
 |-------|----------|
 | Content type | `application/json` on JSON bodies |
 | Trailing slashes | Controllers use trailing `/` — match them |
-| Dates | `LocalDate` → `yyyy-MM-DD`; `LocalDateTime` → ISO-8601 |
-| Password | Never send hash back to UI for display; signup response may include encoded password — strip in UI |
-| Errors | Inconsistent today (string bodies, empty 204, exceptions). Normalize later; FE must handle status + text |
+| Dates | ISO strings: `LocalDate` → `"2026-07-15"`; `LocalDateTime` → `"2026-08-01T22:20:15"` |
+| Password | Write-only on `WebUser` — never serialized in any response |
+| Errors | Validation/conflict errors return JSON `{"error": "message"}` with 400/403/404/409 |
 
 ---
 
@@ -41,13 +41,19 @@ Authn on `/credentials/**`, `/post/**`, `/trade/**`: **permitAll** (not actually
 
 **Notes:**
 
-- Password is BCrypt-hashed server-side before save.
-- No uniqueness check documented — duplicate username/email may 500 or violate DB constraints. Frontend should show a generic failure until backend returns clean 409s.
+- Password is BCrypt-hashed server-side and **never returned** (write-only).
+- `accountPublicStatus` defaults to `true` when omitted.
 - Field names are **camelCase**. Snake_case will silently leave Java fields null.
 
-**Success:** `200` (default) + saved `WebUser` JSON.
+**Responses:**
 
-**Frontend:** On success, navigate to login or auto-login (product decision).
+| Status | Meaning |
+|--------|---------|
+| `201` | Created — body is the saved `WebUser` (id, username, email, names; no password) |
+| `400` | Missing username/email/password — `{"error": "..."}` |
+| `409` | Duplicate username or email — `{"error": "..."}` |
+
+**Frontend:** On success, auto-login (write `postfolio.session` with `id` from response) → `/`.
 
 ### `POST /credentials/login/`
 
@@ -80,22 +86,30 @@ const text = await response.text()
 
 ## Account — `/account`
 
-### `POST /account/status/` (intended)
+### `GET /account/status/?username=demo`
 
-Toggle public/private. Controller file lives under `controllers/account/` but has historically had **package declaration bugs** and missing wiring — verify before depending on it.
+**Success:** `200` + `{"username": "demo", "accountPublicStatus": true}`  
+**Unknown user:** `404` + `{"error": "..."}`
 
-Expected concept:
+### `POST /account/status/`
 
-- Input: user identity + boolean `accountPublicStatus`
-- Effect: private accounts’ posts hidden from public feed (feed filtering **not fully implemented** yet)
+**Request:**
 
-Treat as **unstable** until Phase 2.5.
+```json
+{ "username": "demo", "accountPublic": false }
+```
+
+**Responses:** `200` + updated status body · `400` missing fields · `404` unknown user.
+
+**Effect:** Private accounts’ posts are excluded from `GET /post/feed/`.
 
 ---
 
 ## Posts — `/post`
 
 ### `GET /post/feed/`
+
+Newest-first posts from **public accounts only**.
 
 **Response:** `200` + `Post[]`
 
@@ -136,26 +150,35 @@ Treat as **unstable** until Phase 2.5.
 }
 ```
 
-`username` is required for the **demo** while there is no server session. Backend should: if `@AuthenticationPrincipal` is null, resolve `WebUser` by `username` and attach to the post. Reject with `400` if username missing/unknown.
+`username` is required while there is no server session (demo bridge): when `@AuthenticationPrincipal` is null, the backend resolves `WebUser` by `username`.
 
-**Response:** `201` + `Post`.
+Ticker is normalized to uppercase; `pricePerShare` is computed as `investedAmount / shares`.
 
-**Frontend:** Send `username` from `postfolio.session`. Do not ship the hardcoded `POST /post/stock/test/` (user id `1`) as the product path.
+**Responses:**
 
-### `POST /post/stock/test/`
+| Status | Meaning |
+|--------|---------|
+| `201` | Created — body is the `Post` |
+| `400` | Missing/unknown username, missing ticker, `shares <= 0`, `investedAmount <= 0` — `{"error": "..."}` |
 
-Same body as create without needing username; forces user id `1`. **Dev only** — prefer username bridge for demos with real signups.
+**Frontend:** Send `username` from `postfolio.session`.
 
 ### `POST /post/stock/search/?stockName=AAPL`
 
-**Note:** Stock name is a **query param**, not JSON body (`@RequestParam`).
+**Note:** Stock name is a **query param**, not JSON body (`@RequestParam`). Matching is uppercase-normalized.
 
-**Success:** `200` + `Post[]`  
-**No matches:** `204 No Content` (frontend must not call `.json()` on empty 204).
+**Response:** always `200` + `Post[]` (empty list when no matches — no more 204).
 
-### `POST /post/delete/`
+### `POST /post/delete/?postId=1&username=demo`
 
-Intended to delete by `postId`. Current signature is ambiguous (`deletePost(Long postId)` without `@RequestParam` / `@RequestBody`) — **verify/fix before building UI**. Owner checks not implemented.
+Both query params required. Only the owner can delete.
+
+| Status | Meaning |
+|--------|---------|
+| `204` | Deleted |
+| `400` | Missing params |
+| `403` | Requester is not the post owner |
+| `404` | Post not found |
 
 ---
 
@@ -190,25 +213,23 @@ Re-runs decisions then prices them (`executeAgent`) with allowance `1000`.
 
 ## Status code cheat sheet
 
-| Endpoint | Success | Failure (today) |
-|----------|---------|-----------------|
-| signup | 200 + user | often 500 on constraint |
+| Endpoint | Success | Failure |
+|----------|---------|---------|
+| signup | 201 + user | 400 missing fields · 409 duplicate |
 | login | 202 + username string | 400 + `"Failed!"` |
-| feed | 200 + array | 500 |
-| create post | 201 + post | 500 / null user |
-| search | 200 or **204** | 500 |
+| feed | 200 + array (public only) | 500 |
+| create post | 201 + post | 400 validation/unknown user |
+| search | 200 + array (may be empty) | 500 |
+| delete | 204 | 400 / 403 / 404 |
+| account status | 200 + status JSON | 400 / 404 |
 | trade test/execute | 200 + map | 500 if Ollama/Finnhub down |
 
 ---
 
-## Required backend follow-ups (demo path)
+## Remaining backend follow-ups
 
-1. **Postgres** datasource configured for local (locked — not H2).
-2. **Username demo bridge** on create-post when principal is null.
-3. Signup: prefer `409` on duplicate username/email (nice-to-have).
-4. Search: prefer `200 + []` over `204` for easier SPA handling (or keep 204 and handle in FE).
-5. Delete: explicit `@RequestParam Long postId` + optional username owner check for demo.
-6. Account status: fix package + return clear JSON.
-7. Agent: stable response DTO + clear error when Ollama/Finnhub unavailable.
+1. Agent: stable response DTO + clear error when Ollama/Finnhub unavailable (Phase 3.1).
+
+**Done:** Postgres datasource · username demo bridge · 409 duplicates · search `200 + []` · delete params + owner check · account status GET/POST · password write-only · ISO dates.
 
 **Out of scope for this demo:** JWT, Spring session cookies, real security hardening — unless requested later.

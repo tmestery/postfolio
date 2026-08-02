@@ -11,6 +11,8 @@ public interface UserRepository extends JpaRepository<WebUser, Long> {
 
     Optional<WebUser> findByUsername(String username);
 
+    Optional<WebUser> findByEmail(String email);
+
     @Modifying
     @Query("UPDATE WebUser u SET u.accountPublicStatus = :status WHERE u.id = :userId")
     int setAccountStatus(Long userId, boolean status);

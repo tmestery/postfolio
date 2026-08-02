@@ -1,5 +1,7 @@
 package com.postfolio.postfolio.models.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,8 +19,15 @@ public class WebUser {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "web_user_seq_gen")
     @SequenceGenerator(name = "web_user_seq_gen", sequenceName = "web_user_seq", allocationSize = 1)
     private Long id;
+
+    @Column(unique = true, nullable = false)
     private String username;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
+    // Accepted on signup but never serialized back to clients.
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     private String firstName;
     private String lastName;
