@@ -68,11 +68,11 @@ export default function NewPostPage() {
   }
 
   return (
-    <section className="mx-auto max-w-sm py-10">
-      <h1 className="font-display text-3xl font-semibold text-ink">Share a trade</h1>
-      <p className="mt-1 text-sm text-muted">Post an investment to your feed.</p>
+    <section className="overflow-hidden rounded-2xl border border-line bg-surface px-5 py-6 shadow-[0_1px_0_rgba(20,24,22,0.04)] sm:px-6">
+      <h1 className="font-display text-2xl font-semibold text-ink">Share a trade</h1>
+      <p className="mt-1 text-sm text-muted">This will show up in the home feed for everyone.</p>
 
-      <form onSubmit={handleSubmit} noValidate className="mt-8 flex flex-col gap-4">
+      <form onSubmit={handleSubmit} noValidate className="mt-6 flex flex-col gap-4">
         <Field
           label="Ticker"
           id="stock"

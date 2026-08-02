@@ -1,7 +1,10 @@
 import { apiFetch } from './client'
 
-export async function getFeed() {
-  const { data } = await apiFetch('/post/feed/')
+/** @param {'following'|'discover'} mode */
+export async function getFeed({ username, mode = 'discover' } = {}) {
+  const params = { mode }
+  if (username) params.username = username
+  const { data } = await apiFetch('/post/feed/', { params })
   return Array.isArray(data) ? data : []
 }
 

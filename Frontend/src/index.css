@@ -1,15 +1,15 @@
 @import 'tailwindcss';
 
 @theme {
-  /* Postfolio palette — warm paper, ink text, deep market green accent */
-  --color-paper: #faf9f6;
+  /* Postfolio — cool paper, ink, single market-green accent */
+  --color-paper: #f3f5f4;
   --color-surface: #ffffff;
-  --color-ink: #1c1d1f;
-  --color-muted: #6e6a61;
-  --color-line: #e7e4dc;
-  --color-accent: #1e6b4f;
-  --color-accent-deep: #14503a;
-  --color-accent-soft: #e7f0eb;
+  --color-ink: #141816;
+  --color-muted: #5f6b66;
+  --color-line: #d9e0dc;
+  --color-accent: #0f6b4c;
+  --color-accent-deep: #0a4d37;
+  --color-accent-soft: #e4f2ec;
   --color-danger: #b3261e;
   --color-danger-soft: #f9e9e8;
 
@@ -19,12 +19,37 @@
 }
 
 body {
-  background-color: var(--color-paper);
+  margin: 0;
+  min-height: 100vh;
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  background-color: var(--color-paper);
+  background-image:
+    radial-gradient(900px 420px at 50% -80px, rgba(15, 107, 76, 0.09), transparent 60%),
+    linear-gradient(180deg, #f7f9f8 0%, var(--color-paper) 40%);
+  background-attachment: fixed;
 }
 
 ::selection {
   background-color: var(--color-accent-soft);
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-rise {
+  animation: rise-in 420ms ease-out both;
+}
+
+.animate-rise-delay {
+  animation: rise-in 520ms 80ms ease-out both;
 }

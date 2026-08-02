@@ -3,29 +3,33 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../auth/useAuth'
 import { getFeed, searchPosts, deletePost } from '../../api/posts'
 import PostCard from '../../components/PostCard'
+import Avatar from '../../components/Avatar'
 
 function GuestHero() {
   return (
-    <section className="flex flex-col items-start gap-6 py-16 sm:py-24">
-      <h1 className="font-display text-5xl font-semibold leading-tight tracking-tight text-ink sm:text-6xl">
+    <section className="flex flex-col items-start gap-6 py-14 sm:py-20">
+      <p className="animate-rise font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+        Postfolio
+      </p>
+      <h1 className="animate-rise-delay max-w-lg font-display text-3xl font-semibold leading-tight tracking-tight text-ink sm:text-4xl">
         Share your trades.
         <br />
         <span className="text-accent">Watch the market together.</span>
       </h1>
-      <p className="max-w-md text-lg text-muted">
-        Post your stock investments, follow what your connections are buying, and see what an AI
-        agent trader picks each week.
+      <p className="animate-rise-delay max-w-md text-base text-muted sm:text-lg">
+        Follow investors you care about, get notified when they post, and peek at what the agent desk
+        is paper-trading.
       </p>
-      <div className="flex gap-3">
+      <div className="animate-rise-delay flex gap-3">
         <Link
           to="/signup"
           className="rounded-md bg-accent px-5 py-2.5 font-medium text-white transition-colors hover:bg-accent-deep"
         >
-          Get started
+          Join the feed
         </Link>
         <Link
           to="/login"
-          className="rounded-md border border-line px-5 py-2.5 font-medium text-ink transition-colors hover:border-accent hover:text-accent-deep"
+          className="rounded-md border border-line bg-surface px-5 py-2.5 font-medium text-ink transition-colors hover:border-accent hover:text-accent-deep"
         >
           Log in
         </Link>
@@ -34,9 +38,25 @@ function GuestHero() {
   )
 }
 
+function ComposePrompt({ username }) {
+  return (
+    <Link
+      to="/post/new"
+      className="flex items-center gap-3 border-b border-line px-4 py-3.5 transition-colors hover:bg-accent-soft/40 sm:px-5"
+    >
+      <Avatar name={username} />
+      <span className="flex-1 rounded-full border border-line bg-paper px-4 py-2.5 text-sm text-muted">
+        What did you buy?
+      </span>
+      <span className="rounded-md bg-accent px-3 py-2 text-sm font-medium text-white">Post</span>
+    </Link>
+  )
+}
+
 function Feed({ username }) {
+  const [tab, setTab] = useState('following')
   const [posts, setPosts] = useState([])
-  const [status, setStatus] = useState('loading') // loading | ready | error
+  const [status, setStatus] = useState('loading')
   const [errorMessage, setErrorMessage] = useState('')
   const [query, setQuery] = useState('')
   const [searching, setSearching] = useState(false)
@@ -45,13 +65,13 @@ function Feed({ username }) {
     setStatus('loading')
     setErrorMessage('')
     try {
-      setPosts(await getFeed())
+      setPosts(await getFeed({ username, mode: tab }))
       setStatus('ready')
     } catch (err) {
       setErrorMessage(err.message)
       setStatus('error')
     }
-  }, [])
+  }, [username, tab])
 
   useEffect(() => {
     loadFeed()
@@ -66,6 +86,7 @@ function Feed({ username }) {
     }
     setSearching(true)
     setErrorMessage('')
+    setTab('discover')
     try {
       setPosts(await searchPosts(ticker))
       setStatus('ready')
@@ -83,36 +104,57 @@ function Feed({ username }) {
   }
 
   return (
-    <section>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-3xl font-semibold text-ink">Feed</h1>
-        <form onSubmit={handleSearch} className="flex gap-2">
+    <section className="overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_1px_0_rgba(20,24,22,0.04)]">
+      <div className="flex border-b border-line">
+        {['following', 'discover'].map((name) => (
+          <button
+            key={name}
+            type="button"
+            onClick={() => setTab(name)}
+            className={`flex-1 px-3 py-3 text-sm font-semibold capitalize transition-colors ${
+              tab === name
+                ? 'border-b-2 border-accent text-ink'
+                : 'text-muted hover:bg-accent-soft/30 hover:text-ink'
+            }`}
+          >
+            {name}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3 sm:px-5">
+        <Link to="/people" className="text-sm font-medium text-accent-deep hover:underline">
+          Find people
+        </Link>
+        <form onSubmit={handleSearch} className="flex min-w-0 flex-1 justify-end gap-2 sm:max-w-xs">
           <label htmlFor="ticker-search" className="sr-only">
             Search by ticker
           </label>
           <input
             id="ticker-search"
             type="search"
-            placeholder="Search ticker (e.g. AAPL)"
+            placeholder="Search ticker"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            className="w-48 rounded-md border border-line bg-surface px-3 py-1.5 text-sm outline-none transition-colors placeholder:text-muted/60 focus:border-accent"
+            className="w-full min-w-0 rounded-full border border-line bg-paper px-3.5 py-1.5 text-sm outline-none transition-colors placeholder:text-muted/70 focus:border-accent"
           />
           <button
             type="submit"
             disabled={searching}
-            className="rounded-md border border-line px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:border-accent disabled:opacity-50"
+            className="shrink-0 rounded-full border border-line px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:border-accent disabled:opacity-50"
           >
-            {searching ? 'Searching…' : 'Search'}
+            {searching ? '…' : 'Go'}
           </button>
         </form>
       </div>
 
-      {status === 'loading' && <p className="py-12 text-center text-muted">Loading the feed…</p>}
+      <ComposePrompt username={username} />
+
+      {status === 'loading' && <p className="px-4 py-14 text-center text-sm text-muted">Loading the feed…</p>}
 
       {status === 'error' && (
-        <div className="py-12 text-center">
-          <p aria-live="polite" className="text-danger">
+        <div className="px-4 py-14 text-center">
+          <p aria-live="polite" className="text-sm text-danger">
             {errorMessage}
           </p>
           <button
@@ -126,14 +168,28 @@ function Feed({ username }) {
       )}
 
       {status === 'ready' && posts.length === 0 && (
-        <div className="py-12 text-center">
-          <p className="text-muted">No posts yet.</p>
-          <Link
-            to="/post/new"
-            className="mt-3 inline-block rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-deep"
-          >
-            Share your first trade
-          </Link>
+        <div className="px-4 py-14 text-center">
+          <p className="text-sm text-muted">
+            {tab === 'following'
+              ? 'Your following feed is quiet — find people to connect with.'
+              : 'No public posts yet.'}
+          </p>
+          <div className="mt-4 flex justify-center gap-3">
+            {tab === 'following' && (
+              <Link
+                to="/people"
+                className="rounded-md border border-line px-4 py-2 text-sm font-medium hover:border-accent"
+              >
+                Find people
+              </Link>
+            )}
+            <Link
+              to="/post/new"
+              className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-deep"
+            >
+              Share a trade
+            </Link>
+          </div>
         </div>
       )}
 
