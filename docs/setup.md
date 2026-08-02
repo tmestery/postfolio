@@ -1,5 +1,29 @@
 # Local setup
 
+## Fastest path (Docker Compose)
+
+```bash
+cp .env.example .env
+# put GROQ_API_KEY and FINNHUB_API_KEY in .env
+make up          # or: docker compose up --build
+```
+
+- Frontend: http://localhost:5173  
+- Backend:  http://localhost:8080  
+- Postgres: localhost:5432 (`postfolio` / `postfolio` / `postfolio`)
+
+Postgres only (run Spring + Vite on the host):
+
+```bash
+make env && make postgres
+make backend    # separate terminal
+make frontend   # separate terminal
+```
+
+See root `Makefile` and `.env.example`.
+
+---
+
 ## Prerequisites
 
 | Tool | Version / notes |
@@ -8,11 +32,26 @@
 | npm | Comes with Node |
 | Java | **21** (matches `pom.xml`) |
 | Maven | Use `./mvnw` wrapper in `Backend/postfolio` |
-| **PostgreSQL** | **Required** (local). Do **not** use H2. |
+| **PostgreSQL** | **Required** (local or Docker). Do **not** use H2 at runtime. |
+| Docker | Optional; easiest way to run Postgres / full stack |
 | Groq account | API key for agent LLM calls (`GROQ_API_KEY`) |
 | Finnhub account | API key for news/quotes (`FINNHUB_API_KEY`) |
 
 Ollama is **not** required for the v2 agent path (replaced by Groq).
+
+---
+
+## Environment file (API keys)
+
+Put secrets in the **repo root** `.env` (gitignored):
+
+```bash
+cp .env.example .env
+# edit GROQ_API_KEY=... and FINNHUB_API_KEY=...
+make env   # also writes Frontend/.env with VITE_* vars
+```
+
+The backend loads root `.env` automatically on startup (`DotenvBootstrap`). Docker Compose reads the same file via `env_file`. Never commit `.env`.
 
 ---
 

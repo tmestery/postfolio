@@ -1,0 +1,13 @@
+**/.git
+**/.gitignore
+**/node_modules
+**/target
+**/.env
+**/.env.local
+**/dist
+**/.idea
+**/.vscode
+**/.DS_Store
+**/agent-transcripts
+**/*.md
+!Backend/postfolio/pom.xml
