@@ -198,9 +198,9 @@ Deep multi-agent research run (paper book through Risk Gate, **no fills**). Opti
 
 **Response:** `200` + `RunResult` DTO — see [agent-trader-v2.md](./agent-trader-v2.md) §8. Key fields: `runId`, `status`, `candidates`, `allocatorProposals`, `capitalJudgeDecision`, `plannedShares`, `agentTrace`.
 
-Requires `GROQ_API_KEY` + `FINNHUB_API_KEY`.
+Requires `GROQ_API_KEY`. News/quotes come from the v3 web research crew (no Finnhub).
 
-**Failure:** `503` + `{"error": "..."}` when Groq/Finnhub key missing or provider down.
+**Failure:** `503` + `{"error": "..."}` when Groq key missing, Groq down, or research pack empty.
 
 ### `GET /trade/stock/execute/`
 
@@ -239,7 +239,7 @@ Full persisted `RunResult` for the agent desk history drill-in.
 | search | 200 + array (may be empty) | 500 |
 | delete | 204 | 400 / 403 / 404 |
 | account status | 200 + status JSON | 400 / 404 |
-| trade test/execute | 200 + `RunResult` | 503 + `{error}` if Groq/Finnhub down or key missing |
+| trade test/execute | 200 + `RunResult` | 503 + `{error}` if Groq/research unavailable |
 | trade runs | 200 + summary array | 500 |
 
 ---

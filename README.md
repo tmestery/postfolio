@@ -27,7 +27,7 @@ and follow an LLM agent trader that reads market news and simulates its own pick
 | Pillar | Description |
 |--------|-------------|
 | **Social investment feed** | Sign up, post trades (ticker, shares, amount, date), and browse everyone's public positions newest-first. Search by ticker, delete your own posts, and flip your account private to drop out of the feed. |
-| **AI agent trader** | A deep multi-agent desk on Groq: Finnhub news → bull/bear debate → stock judge → capital committee (aggressive / balanced / defensive + cash guard + capital judge) → risk gate → simulated fills within a $1,000 allowance. Full `agentTrace` for the UI. |
+| **AI agent trader** | A deep multi-agent desk on Groq: web research → bull/bear debate → stock judge → capital committee (aggressive / balanced / defensive + cash guard + capital judge) → risk gate → simulated fills within a $1,000 allowance. Full `agentTrace` for the UI. |
 | **Demo-grade auth** | Deliberately simple `localStorage` session (`postfolio.session`) with auto-login after signup and protected routes — no JWT/cookie machinery, by design (see [locked decisions](docs/product-decisions.md)). |
 
 ## Architecture
@@ -47,22 +47,22 @@ and follow an LLM agent trader that reads market news and simulates its own pick
 └──────┬────────────────────┬─────────────────────┬────────────┘
        │                    │                     │
        ▼                    ▼                     ▼
-  PostgreSQL           Finnhub API           Groq API
-  users + posts        news + quotes         chat completions
+  PostgreSQL           Public web            Groq API
+  users + posts        news RSS + Yahoo      chat completions
   + agent_run
 ```
 
 ### The agent pipeline, step by step
 
-1. **News Scout** — Finnhub market headlines
+1. **Research crew** — Source Planner → Web Scouts → Evidence Packer
 2. **Bull → Bear → Stock Judge** — adversarial ticker debate on Groq
-3. **Quote snapshot** — one Finnhub price map; drop unquoted names
+3. **Price Scout** — Yahoo chart quotes; drop unquoted names
 4. **Capital committee** — Aggressive / Balanced / Defensive allocators + Cash Guard + Capital Judge
 5. **Position Sizer + Risk Gate** — dollars → whole shares; enforce reserve floor & weight caps
 6. **Executor** — simulated fills at the same snapshot prices
 7. **Persist** — run summary + full `RunResult` JSON for history
 
-Every dependency failure (missing Groq/Finnhub key, provider down) returns a
+Every dependency failure (missing Groq key, empty research pack, provider down) returns a
 structured `503 + {"error": "..."}` that the UI surfaces verbatim. Details: [docs/agent-trader-v2.md](docs/agent-trader-v2.md).
 
 ## Feature checklist
@@ -80,12 +80,12 @@ structured `503 + {"error": "..."}` that the UI surfaces verbatim. Details: [doc
 
 ## Quick start
 
-**Prerequisites:** Docker **or** (Java 21 · Node 20+ · PostgreSQL) · *(for the agent)* [Groq](https://groq.com) + [Finnhub](https://finnhub.io) API keys.
+**Prerequisites:** Docker **or** (Java 21 · Node 20+ · PostgreSQL) · *(for the agent)* [Groq](https://groq.com) API key.
 
 ```bash
 # 0. Secrets (repo root — never commit .env)
 cp .env.example .env
-# edit GROQ_API_KEY=... and FINNHUB_API_KEY=...
+# edit GROQ_API_KEY=...
 
 # Option A — full stack via Docker
 make up

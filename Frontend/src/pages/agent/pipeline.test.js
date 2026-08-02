@@ -11,8 +11,8 @@ describe('buildPipelineView', () => {
   it('marks completed stages from the trace and leaves later ones skipped', () => {
     const view = buildPipelineView(
       [
-        { agent: 'news_scout', status: 'ok', summary: 'Fetched 10' },
-        { agent: 'bull', status: 'ok', summary: 'Proposed 3' },
+        { agent: 'source_planner', status: 'ok', summary: 'Planned 3' },
+        { agent: 'web_scout', status: 'ok', summary: 'Fetched 2' },
       ],
       { running: false, mode: 'research' },
     )
@@ -31,7 +31,7 @@ describe('buildPipelineView', () => {
 
   it('while running, first unfinished stage is active and the rest are queued', () => {
     const view = buildPipelineView(
-      [{ agent: 'news_scout', status: 'ok', summary: 'Fetched 10' }],
+      [{ agent: 'source_planner', status: 'ok', summary: 'Planned 3' }],
       { running: true, mode: 'execute' },
     )
     expect(view[0].phase).toBe('done')

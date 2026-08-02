@@ -1,6 +1,6 @@
 # Agent Trader v3 — Multi-Agent Web Research (No Finnhub)
 
-**Status:** Design / plan (not implemented).  
+**Status:** Implemented (web research crew + Yahoo Price Scout; Finnhub removed).  
 **Audience:** Coding agents + humans replacing Finnhub-backed market data with a scrapable, multi-agent research desk.  
 **Supersedes for data ingress:** Finnhub usage in [agent-trader-v2.md](./agent-trader-v2.md) (**A3**).  
 **Keeps from v2:** Groq LLMs, bull/bear/judge, capital committee, Risk Gate, simulated fills, Postgres run history.  

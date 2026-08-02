@@ -39,9 +39,11 @@ const sampleResult = {
   },
   plannedShares: { NVDA: 2 },
   executedTrades: { NVDA: { shares: 2, price: 120, cost: 240 } },
+  evidencePack: [{ title: 'Chips rally', url: 'https://feeds.bbci.co.uk/x' }],
   agentTrace: [
-    { step: 1, agent: 'news_scout', status: 'ok', summary: 'Fetched 60 headlines' },
-    { step: 2, agent: 'bull', status: 'ok', summary: 'Proposed 1 candidate(s)' },
+    { step: 1, agent: 'source_planner', status: 'ok', summary: 'Planned 3 public source(s)' },
+    { step: 2, agent: 'web_scout', status: 'ok', summary: 'Fetched 2 source(s), skipped 0' },
+    { step: 3, agent: 'bull', status: 'ok', summary: 'Proposed 1 candidate(s)' },
   ],
 }
 
@@ -76,7 +78,9 @@ describe('AgentPage', () => {
     const container = await renderPage()
     await clickButton(container, 'execute')
 
-    expect(container.textContent).toContain('News Scout')
+    expect(container.textContent).toContain('Source Planner')
+    expect(container.textContent).toContain('Web Scout')
+    expect(container.textContent).toContain('Sources')
     expect(container.textContent).toContain('Spawns')
     expect(container.textContent).not.toMatch(/call trace/i)
     expect(container.textContent).toMatch(/capital judge/i)

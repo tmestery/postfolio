@@ -12,8 +12,7 @@ import com.postfolio.postfolio.stockInvestmentAgents.execute.TradeExecutor;
 import com.postfolio.postfolio.stockInvestmentAgents.groq.GroqConfig;
 import com.postfolio.postfolio.stockInvestmentAgents.model.Candidate;
 import com.postfolio.postfolio.stockInvestmentAgents.model.RunResult;
-import com.postfolio.postfolio.stockInvestmentAgents.news.NewsScout;
-import com.postfolio.postfolio.stockInvestmentAgents.news.QuoteService;
+import com.postfolio.postfolio.stockInvestmentAgents.research.ResearchSupervisor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,16 +22,14 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Orchestrates one agent run (docs/agent-trader-v2.md §5.1): news → bull →
- * bear → stock judge → quote snapshot/investability gate → capital committee
- * → (optionally) executor. Owns the wall-clock timeout and persists the run.
+ * Orchestrates one agent run (docs/agent-trader-v3.md): web research → bull →
+ * bear → stock judge → price scout → capital committee → (optionally) executor.
  */
 @Service
 public class RunSupervisor {
 
     private final GroqConfig config;
-    private final NewsScout newsScout;
-    private final QuoteService quoteService;
+    private final ResearchSupervisor research;
     private final BullAgent bull;
     private final BearAgent bear;
     private final StockJudgeAgent stockJudge;
@@ -41,13 +38,12 @@ public class RunSupervisor {
     private final AgentRunRepository runRepository;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public RunSupervisor(GroqConfig config, NewsScout newsScout, QuoteService quoteService,
+    public RunSupervisor(GroqConfig config, ResearchSupervisor research,
                          BullAgent bull, BearAgent bear, StockJudgeAgent stockJudge,
                          CapitalSupervisor capital, TradeExecutor executor,
                          AgentRunRepository runRepository) {
         this.config = config;
-        this.newsScout = newsScout;
-        this.quoteService = quoteService;
+        this.research = research;
         this.bull = bull;
         this.bear = bear;
         this.stockJudge = stockJudge;
@@ -70,9 +66,7 @@ public class RunSupervisor {
         result.remainingAllowance = result.startingAllowance;
 
         try {
-            List<String> headlines = newsScout.fetchHeadlines();
-            result.addTrace("news_scout", "ok", "Fetched %d headlines".formatted(headlines.size()),
-                    Map.of("sample", headlines.subList(0, Math.min(5, headlines.size()))));
+            List<String> headlines = research.gatherEvidence(result);
             if (timedOut(startedAt, result)) return persist(result, username);
 
             List<Candidate> candidates = bull.propose(headlines);
@@ -101,9 +95,8 @@ public class RunSupervisor {
             }
             if (timedOut(startedAt, result)) return persist(result, username);
 
-            // §5.5b — one quote snapshot per run + investability gate.
-            result.quoteSnapshot = quoteService.snapshot(
-                    verdict.advanced().stream().map(c -> c.ticker).toList());
+            result.quoteSnapshot = research.quoteSnapshot(
+                    result, verdict.advanced().stream().map(c -> c.ticker).toList());
             List<Candidate> investable = verdict.advanced().stream()
                     .filter(c -> result.quoteSnapshot.containsKey(c.ticker))
                     .toList();
@@ -112,9 +105,6 @@ public class RunSupervisor {
                     result.rejectedTickers.add(Map.of("ticker", c.ticker, "reason", "no_valid_quote"));
                 }
             }
-            result.addTrace("quote_snapshot", "ok",
-                    "Quoted %d of %d tickers".formatted(investable.size(), verdict.advanced().size()),
-                    Map.of("quotes", result.quoteSnapshot));
             if (investable.isEmpty()) {
                 result.addTrace("supervisor", "stopped", "No investable tickers with valid quotes", Map.of());
                 return persist(result, username);
@@ -158,7 +148,6 @@ public class RunSupervisor {
             run.setResultJson(mapper.writeValueAsString(result));
             runRepository.save(run);
         } catch (Exception e) {
-            // History is a nice-to-have; never fail a demo run over it.
             System.err.println("Could not persist agent run: " + e.getMessage());
         }
         return result;

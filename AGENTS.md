@@ -29,7 +29,7 @@ Postfolio is a full-stack **web** app: React (Vite) frontend + Spring Boot REST 
 - **Tests**: For every feature or behavior change, ship **1 positive** test and **3 negative / edge-case** tests. See `skills/unit-testing/SKILL.md`.
 - **PRs & issues**: Clear summaries, repro steps, and test plans.
 - **Lint**: No blanket linter disables; see `docs/lint-anti-patterns.md`.
-- **Security**: No secrets in git; validate untrusted input. API keys via env (`FINNHUB_API_KEY`, etc.) — never in the frontend bundle.
+- **Security**: No secrets in git; validate untrusted input. API keys via env (`GROQ_API_KEY`, etc.) — never in the frontend bundle.
 - **Scope**: Small, reviewable diffs. Prefer vertical slices (`docs/implementation-roadmap.md`).
 
 ## Project map
@@ -65,5 +65,5 @@ When user says `caveman` / `talk like caveman` / `/caveman`, load `caveman`. Off
 - Login success is **HTTP 202 + plain text username**, not JSON — see `docs/rest-api-contract.md`.
 - Demo session: `localStorage['postfolio.session']`.
 - Database: **PostgreSQL** local — see `docs/local-development.md`.
-- Agent pipeline needs local **Ollama** (`llama3`, `nomic-embed-text`) + Finnhub key.
+- Agent pipeline needs `GROQ_API_KEY`; scrapes public news + Yahoo quotes (see `docs/agent-trader-v3.md`).
 - Prefer project docs over improvising design systems, auth schemes, or mobile frameworks.
