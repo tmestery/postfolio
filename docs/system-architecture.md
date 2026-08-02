@@ -1,4 +1,4 @@
-# Architecture
+# System architecture
 
 Postfolio is a **browser web app** (not a native mobile app): a React SPA talks to a Spring Boot REST API over JSON.
 
@@ -25,9 +25,9 @@ Postfolio is a **browser web app** (not a native mobile app): a React SPA talks 
                                         (JSON file today)
 ```
 
-**Auth (demo):** Browser `localStorage` key `postfolio.session` — not JWT. See [frontend.md](./frontend.md) §5.
+**Auth (demo):** Browser `localStorage` key `postfolio.session` — not JWT. See [frontend-ui-guide.md](./frontend-ui-guide.md) §5.
 
-For API shapes see [api.md](./api.md). For UI rules see [frontend.md](./frontend.md).
+For API shapes see [rest-api-contract.md](./rest-api-contract.md). For UI rules see [frontend-ui-guide.md](./frontend-ui-guide.md).
 
 ---
 
@@ -48,7 +48,7 @@ Users create accounts, optionally mark profiles public/private, and publish **in
 
 Others browse a **feed**, search by ticker, and (eventually) only owners delete their posts.
 
-README mentions “connections” — follow graph is **not built**. v1 assumption (until [open-questions.md](./open-questions.md) Q4): global feed of public posts.
+README mentions “connections” — follow graph is **not built**. v1 assumption (until [product-decisions.md](./product-decisions.md) Q4): global feed of public posts.
 
 ### 2. LLM agent trader
 
@@ -80,11 +80,11 @@ Decision agent stubs (`safeDecisionAgent`, `riskyDecisionAgent`) and Reuters `Da
 
 ### Config
 
-`src/main/resources/application.properties` is currently minimal. **Locked:** configure **PostgreSQL** for local (not H2). Datasource URL/user/password via env — see [setup.md](./setup.md).
+`src/main/resources/application.properties` is currently minimal. **Locked:** configure **PostgreSQL** for local (not H2). Datasource URL/user/password via env — see [local-development.md](./local-development.md).
 
 ### CI
 
-`.github/workflows/maven.yml` builds the backend. Align JDK with `pom.xml` (Java 21) — called out in [plan.md](./plan.md) Phase 0.3.
+`.github/workflows/maven.yml` builds the backend. Align JDK with `pom.xml` (Java 21) — called out in [implementation-roadmap.md](./implementation-roadmap.md) Phase 0.3.
 
 ---
 
@@ -100,7 +100,7 @@ Decision agent stubs (`safeDecisionAgent`, `riskyDecisionAgent`) and Reuters `Da
 | `routes.jsx` | Router | Partial |
 | `index.css` | Tailwind entry | No design tokens yet |
 
-Detailed FE rules: [frontend.md](./frontend.md).
+Detailed FE rules: [frontend-ui-guide.md](./frontend-ui-guide.md).
 
 ---
 
@@ -130,8 +130,8 @@ Detailed FE rules: [frontend.md](./frontend.md).
 
 | Doc | Use when |
 |-----|----------|
-| [frontend.md](./frontend.md) | Any UI change |
-| [api.md](./api.md) | Wiring fetch / contracts |
-| [plan.md](./plan.md) | What to build next |
-| [setup.md](./setup.md) | Running locally |
-| [open-questions.md](./open-questions.md) | Unresolved product/design choices |
+| [frontend-ui-guide.md](./frontend-ui-guide.md) | Any UI change |
+| [rest-api-contract.md](./rest-api-contract.md) | Wiring fetch / contracts |
+| [implementation-roadmap.md](./implementation-roadmap.md) | What to build next |
+| [local-development.md](./local-development.md) | Running locally |
+| [product-decisions.md](./product-decisions.md) | Unresolved product/design choices |

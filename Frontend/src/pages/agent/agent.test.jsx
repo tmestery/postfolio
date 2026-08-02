@@ -70,23 +70,23 @@ describe('AgentPage', () => {
     trades.executeAgentTrades.mockReset()
   })
 
-  // Positive: execute path renders trace, capital panel, and fills.
-  it('renders mocked execute result with trace and fills', async () => {
+  // Positive: execute path renders desk window with spawns + fills (no call trace).
+  it('renders mocked execute result inside the desk window', async () => {
     trades.executeAgentTrades.mockResolvedValue(sampleResult)
     const container = await renderPage()
     await clickButton(container, 'execute')
 
     expect(container.textContent).toContain('News Scout')
-    expect(container.textContent).toContain('Spawned agents')
-    expect(container.textContent).toContain('Call trace')
+    expect(container.textContent).toContain('Spawns')
+    expect(container.textContent).not.toMatch(/call trace/i)
     expect(container.textContent).toMatch(/capital judge/i)
     expect(container.textContent).toContain('Mild overweight on NVDA')
     expect(container.textContent).toContain('$240.00')
     container.remove()
   })
 
-  // Negative: empty trace still shows a calm empty state.
-  it('shows empty-trace message when agentTrace is missing', async () => {
+  // Negative: empty trace still shows calm empty copy inside the desk.
+  it('shows empty-steps message when agentTrace is missing', async () => {
     trades.runAgentResearch.mockResolvedValue({
       ...sampleResult,
       agentTrace: [],

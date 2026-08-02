@@ -1,4 +1,4 @@
-# Local setup
+# Local development
 
 ## Fastest path (Docker Compose)
 
@@ -128,7 +128,7 @@ curl -s http://localhost:8080/post/feed/
 curl -s http://localhost:8080/trade/stock/test/
 ```
 
-More contract detail: [api.md](./api.md).
+More contract detail: [rest-api-contract.md](./rest-api-contract.md).
 
 ---
 
@@ -151,11 +151,11 @@ VITE_SERVER_URL=http://localhost:8080
 VITE_CLIENT_URL=http://localhost:5173
 ```
 
-Code must read `import.meta.env.VITE_*` — not `process.env` (see [frontend.md](./frontend.md) §4).
+Code must read `import.meta.env.VITE_*` — not `process.env` (see [frontend-ui-guide.md](./frontend-ui-guide.md) §4).
 
 ### Demo auth
 
-After login/signup, FE stores `localStorage['postfolio.session']` = `{"username":"...","id":...}`. See [frontend.md](./frontend.md) §5. This is intentional for demos — not production security.
+After login/signup, FE stores `localStorage['postfolio.session']` = `{"username":"...","id":...}`. See [frontend-ui-guide.md](./frontend-ui-guide.md) §5. This is intentional for demos — not production security.
 
 ### Lint & tests
 
@@ -165,7 +165,7 @@ npm run lint
 npm test        # Vitest (jsdom)
 ```
 
-Follow [anti-linter-patterns.md](./anti-linter-patterns.md).
+Follow [lint-anti-patterns.md](./lint-anti-patterns.md).
 
 ---
 
@@ -177,7 +177,7 @@ Follow [anti-linter-patterns.md](./anti-linter-patterns.md).
 | `skills/` | Portable Agent Skills |
 | `.cursor/skills/` | Cursor copy of the same |
 
-Before UI work → **`docs/frontend.md`**. Locked vs open decisions → **`docs/open-questions.md`**. Build order → **`docs/plan.md`**.
+Before UI work → **`docs/frontend-ui-guide.md`**. Locked vs open decisions → **`docs/product-decisions.md`**. Build order → **`docs/implementation-roadmap.md`**.
 
 ---
 

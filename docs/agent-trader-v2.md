@@ -2,7 +2,7 @@
 
 **Status:** Implemented (v2 pipeline live — Groq multi-agent + capital committee).  
 **Audience:** Coding agents + humans rebuilding the LLM agent trader.  
-**Related:** [architecture.md](./architecture.md) · [api.md](./api.md) · [plan.md](./plan.md) · [setup.md](./setup.md)
+**Related:** [system-architecture.md](./system-architecture.md) · [rest-api-contract.md](./rest-api-contract.md) · [implementation-roadmap.md](./implementation-roadmap.md) · [local-development.md](./local-development.md)
 
 ---
 
@@ -401,7 +401,7 @@ Preserve paths for FE compatibility; **upgrade bodies**.
 May stop after Stock Judge (no capital spend) **or** run capital proposals without executing fills. Prefer documenting one behavior and sticking to it.
 
 **Recommended v2 behavior:** Full pipeline through Capital Judge + Position Sizer **without** calling Executor (paper book only).  
-**Alternative:** Stop after Stock Judge. Choose during implementation and update [api.md](./api.md).
+**Alternative:** Stop after Stock Judge. Choose during implementation and update [rest-api-contract.md](./rest-api-contract.md).
 
 ### `GET /trade/stock/execute/` — full run including fills
 
@@ -458,7 +458,7 @@ May stop after Stock Judge (no capital spend) **or** run capital proposals witho
 | Missing Finnhub / empty news | 503 | existing style messages |
 | Timeout → partial | 200 or 504 (pick one; prefer **200 + `status: "partial"`** with trace) | include `error` or `warning` |
 
-Update [api.md](./api.md) when implementing.
+Update [rest-api-contract.md](./rest-api-contract.md) when implementing.
 
 ---
 
@@ -540,7 +540,7 @@ v1 classes may be replaced in place or deleted once v2 path is green — prefer 
 | `AGENT_CASH_RESERVE_PCT` | Optional | Default `0.15` |
 | `AGENT_TIMEOUT_MS` | Optional | Default `60000` |
 
-Document in [setup.md](./setup.md) and `.env.example` (backend). Remove Ollama as a **required** setup step; may mention as legacy removed.
+Document in [local-development.md](./local-development.md) and `.env.example` (backend). Remove Ollama as a **required** setup step; may mention as legacy removed.
 
 ---
 
@@ -616,11 +616,11 @@ Work in vertical slices. Each slice: code + **1 positive + 3 negative** tests + 
 
 ### Slice 8 — FE agent UX
 - **Goal:** Trace timeline + capital panel + fills; update copy (Groq, not Ollama).  
-- **FE checklist:** [frontend.md](./frontend.md).  
+- **FE checklist:** [frontend-ui-guide.md](./frontend-ui-guide.md).  
 - **Tests:** render mocked result; empty trace; error 503 message; partial status.
 
 ### Slice 9 — Docs cleanup
-- Update [api.md](./api.md), [setup.md](./setup.md), [architecture.md](./architecture.md), [plan.md](./plan.md), README agent section. Remove Ollama as required.
+- Update [rest-api-contract.md](./rest-api-contract.md), [local-development.md](./local-development.md), [system-architecture.md](./system-architecture.md), [implementation-roadmap.md](./implementation-roadmap.md), README agent section. Remove Ollama as required.
 
 ---
 
@@ -683,7 +683,7 @@ Delete or quarantine dead Ollama code once Slice 6 is green to avoid two sources
 ## 20. Reading order for implementers
 
 1. This document (§3–§6 especially)  
-2. [api.md](./api.md) — update as slices land  
-3. [setup.md](./setup.md) — Groq env  
-4. [frontend.md](./frontend.md) — before agent UI changes  
+2. [rest-api-contract.md](./rest-api-contract.md) — update as slices land  
+3. [local-development.md](./local-development.md) — Groq env  
+4. [frontend-ui-guide.md](./frontend-ui-guide.md) — before agent UI changes  
 5. Existing `stockInvestmentAgents/**` — replace deliberately, don’t layer forever  

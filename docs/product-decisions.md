@@ -1,4 +1,4 @@
-# Decisions & open questions
+# Product decisions (locked + open)
 
 ## Locked decisions (do not reopen without asking)
 
@@ -49,7 +49,7 @@ Omit null/empty optional names rather than sending empty strings if easier.
 
 `id` may be null until login/signup responses reliably return it. Prefer storing `id` from signup response (`WebUser.id`) when present; login today returns only username string — username is enough for demo gating.
 
-**Demo backend bridge:** Because there is no real server session, create-post cannot rely on `@AuthenticationPrincipal`. Plan includes accepting `username` (from localStorage) on create-post for attribution during the demo. Documented in [api.md](./api.md) / [plan.md](./plan.md).
+**Demo backend bridge:** Because there is no real server session, create-post cannot rely on `@AuthenticationPrincipal`. Plan includes accepting `username` (from localStorage) on create-post for attribution during the demo. Documented in [rest-api-contract.md](./rest-api-contract.md) / [implementation-roadmap.md](./implementation-roadmap.md).
 
 ---
 
@@ -69,7 +69,7 @@ Optimize for a **demoable** path: auth works → data persists in Postgres → f
 | **8** | Search + delete + account privacy | Nice-to-have for fuller demo |
 | **9** | CI JDK 21, security harden, polish | After demo path works |
 
-Visual direction (Q7) still open — use temporary soft-product defaults in [frontend.md](./frontend.md) until answered; don’t block ranks 1–6 on brand.
+Visual direction (Q7) still open — use temporary soft-product defaults in [frontend-ui-guide.md](./frontend-ui-guide.md) until answered; don’t block ranks 1–6 on brand.
 
 ---
 
@@ -79,9 +79,9 @@ Legend: **P1** = helps polished FE · **P2** = can wait
 
 ### Q4. Feed model — **P1**
 Global public / following graph / hybrid?  
-**Working assumption (proposed in [social-network.md](./social-network.md)):** **hybrid** — Home has **Following** (accepted followees + self) and **Discover** (global public). One-way follows; **private accounts use follow requests** (accept/decline).
+**Working assumption (proposed in [social-network-design.md](./social-network-design.md)):** **hybrid** — Home has **Following** (accepted followees + self) and **Discover** (global public). One-way follows; **private accounts use follow requests** (accept/decline).
 
-**Answered:** Hybrid Following + Discover; private accounts use follow requests (see [social-network.md](./social-network.md)).
+**Answered:** Hybrid Following + Discover; private accounts use follow requests (see [social-network-design.md](./social-network-design.md)).
 
 ### Q5. Who runs/sees the LLM agent? — **P1**
 Shared house agent / per-user / admin-only?  
@@ -129,4 +129,4 @@ Q4: A
 Q7: B — navy + gold, serif display + sans body, text-only wordmark
 ```
 
-Mark `**Answered:**` here and copy brand tokens into [frontend.md](./frontend.md) §12 when Q7 lands.
+Mark `**Answered:**` here and copy brand tokens into [frontend-ui-guide.md](./frontend-ui-guide.md) §12 when Q7 lands.

@@ -29,4 +29,4 @@ await send(batch[i])
 
 ## Full reference
 
-See [docs/anti-linter-patterns.md](../../docs/anti-linter-patterns.md).
+See [docs/lint-anti-patterns.md](../../docs/lint-anti-patterns.md).

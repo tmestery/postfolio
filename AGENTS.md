@@ -7,13 +7,13 @@ Postfolio is a full-stack **web** app: React (Vite) frontend + Spring Boot REST 
 ## Before you start
 
 1. Read this file.
-2. Skim `docs/open-questions.md` — honor **locked** decisions; do not invent answers for remaining open items (use working assumptions only).
-3. Read `docs/plan.md` for the **ranked** slice you are implementing.
-4. **Any LLM agent trader work:** read `docs/agent-trader-v2.md` (Groq deep multi-agent redesign).
-5. **Any follows / feed graph / notifications work:** read `docs/social-network.md` first; do not implement until that design is approved.
-6. **Any frontend / UI / CSS / page work:** read `docs/frontend.md` fully and follow it literally (it overrides generic UI habits).
-7. **Any API wiring:** read `docs/api.md`.
-7. Load matching skills from `skills/` or `.cursor/skills/`.
+2. Skim `docs/product-decisions.md` — honor **locked** decisions; do not invent answers for remaining open items (use working assumptions only).
+3. Read `docs/implementation-roadmap.md` for the **ranked** slice you are implementing.
+4. **Any LLM agent trader work:** read `docs/agent-trader-v2.md` (current Groq pipeline), `docs/agent-trader-v3.md` (Finnhub removal → web research), and `docs/agent-trader-v4.md` (paper portfolio P&L — plan only until implemented).
+5. **Any follows / feed graph / notifications work:** read `docs/social-network-design.md` first; do not implement until that design is approved.
+6. **Any frontend / UI / CSS / page work:** read `docs/frontend-ui-guide.md` fully and follow it literally (it overrides generic UI habits).
+7. **Any API wiring:** read `docs/rest-api-contract.md`.
+8. Load matching skills from `skills/` or `.cursor/skills/`.
 
 ## Locked demo decisions (summary)
 
@@ -28,9 +28,9 @@ Postfolio is a full-stack **web** app: React (Vite) frontend + Spring Boot REST 
 
 - **Tests**: For every feature or behavior change, ship **1 positive** test and **3 negative / edge-case** tests. See `skills/unit-testing/SKILL.md`.
 - **PRs & issues**: Clear summaries, repro steps, and test plans.
-- **Lint**: No blanket linter disables; see `docs/anti-linter-patterns.md`.
+- **Lint**: No blanket linter disables; see `docs/lint-anti-patterns.md`.
 - **Security**: No secrets in git; validate untrusted input. API keys via env (`FINNHUB_API_KEY`, etc.) — never in the frontend bundle.
-- **Scope**: Small, reviewable diffs. Prefer vertical slices (`docs/plan.md`).
+- **Scope**: Small, reviewable diffs. Prefer vertical slices (`docs/implementation-roadmap.md`).
 
 ## Project map
 
@@ -38,7 +38,7 @@ Postfolio is a full-stack **web** app: React (Vite) frontend + Spring Boot REST 
 |------|------|
 | `Frontend/` | React 19 + Vite + Tailwind SPA |
 | `Backend/postfolio/` | Spring Boot 4 / Java 21 API |
-| `docs/` | Architecture, API, frontend bible, setup, roadmap, open questions |
+| `docs/` | System architecture, REST contract, UI guide, local dev, roadmap, product decisions |
 | `skills/` | Portable agent skills (LLM-agnostic) |
 
 ## Skill routing
@@ -60,10 +60,10 @@ When user says `caveman` / `talk like caveman` / `/caveman`, load `caveman`. Off
 
 ## Stack notes
 
-- Frontend API base: Vite `import.meta.env.VITE_SERVER_URL` (see `docs/frontend.md` — current `process.env` usage is wrong).
+- Frontend API base: Vite `import.meta.env.VITE_SERVER_URL` (see `docs/frontend-ui-guide.md` — current `process.env` usage is wrong).
 - Backend CORS expects Vite at `http://localhost:5173`.
-- Login success is **HTTP 202 + plain text username**, not JSON — see `docs/api.md`.
+- Login success is **HTTP 202 + plain text username**, not JSON — see `docs/rest-api-contract.md`.
 - Demo session: `localStorage['postfolio.session']`.
-- Database: **PostgreSQL** local — see `docs/setup.md`.
+- Database: **PostgreSQL** local — see `docs/local-development.md`.
 - Agent pipeline needs local **Ollama** (`llama3`, `nomic-embed-text`) + Finnhub key.
 - Prefer project docs over improvising design systems, auth schemes, or mobile frameworks.

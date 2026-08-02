@@ -28,7 +28,7 @@ and follow an LLM agent trader that reads market news and simulates its own pick
 |--------|-------------|
 | **Social investment feed** | Sign up, post trades (ticker, shares, amount, date), and browse everyone's public positions newest-first. Search by ticker, delete your own posts, and flip your account private to drop out of the feed. |
 | **AI agent trader** | A deep multi-agent desk on Groq: Finnhub news → bull/bear debate → stock judge → capital committee (aggressive / balanced / defensive + cash guard + capital judge) → risk gate → simulated fills within a $1,000 allowance. Full `agentTrace` for the UI. |
-| **Demo-grade auth** | Deliberately simple `localStorage` session (`postfolio.session`) with auto-login after signup and protected routes — no JWT/cookie machinery, by design (see [locked decisions](docs/open-questions.md)). |
+| **Demo-grade auth** | Deliberately simple `localStorage` session (`postfolio.session`) with auto-login after signup and protected routes — no JWT/cookie machinery, by design (see [locked decisions](docs/product-decisions.md)). |
 
 ## Architecture
 
@@ -118,7 +118,7 @@ npm run dev
 
 </details>
 
-Full walkthrough and smoke-test curls: [docs/setup.md](docs/setup.md). Keys live in root [`.env.example`](.env.example).
+Full walkthrough and smoke-test curls: [docs/local-development.md](docs/local-development.md). Keys live in root [`.env.example`](.env.example).
 
 ## API at a glance
 
@@ -135,7 +135,7 @@ Full walkthrough and smoke-test curls: [docs/setup.md](docs/setup.md). Keys live
 | `/trade/stock/execute/` | GET | `200` + `RunResult` (fills + trace) | `503` + `{error}` |
 | `/trade/runs/` | GET | `200` + recent run summaries | — |
 
-Full contracts with request/response bodies: [docs/api.md](docs/api.md).
+Full contracts with request/response bodies: [docs/rest-api-contract.md](docs/rest-api-contract.md).
 
 ## Testing
 
@@ -177,20 +177,22 @@ postfolio/
 | Doc | Read it when |
 |-----|--------------|
 | [docs/README.md](docs/README.md) | You want the index |
-| [docs/architecture.md](docs/architecture.md) | Understanding how the pieces fit |
-| [docs/api.md](docs/api.md) | Wiring any HTTP call |
-| [docs/frontend.md](docs/frontend.md) | **Any UI work** — design tokens, rules, anti-patterns |
-| [docs/setup.md](docs/setup.md) | Running locally / troubleshooting |
-| [docs/plan.md](docs/plan.md) | Roadmap and what shipped |
-| [docs/open-questions.md](docs/open-questions.md) | Locked decisions + open product questions |
-| [docs/social-network.md](docs/social-network.md) | Follows, networked feed, notifications (design) |
+| [docs/system-architecture.md](docs/system-architecture.md) | Understanding how the pieces fit |
+| [docs/rest-api-contract.md](docs/rest-api-contract.md) | Wiring any HTTP call |
+| [docs/frontend-ui-guide.md](docs/frontend-ui-guide.md) | **Any UI work** — design tokens, rules, anti-patterns |
+| [docs/local-development.md](docs/local-development.md) | Running locally / troubleshooting |
+| [docs/implementation-roadmap.md](docs/implementation-roadmap.md) | Roadmap and what shipped |
+| [docs/product-decisions.md](docs/product-decisions.md) | Locked decisions + open product questions |
+| [docs/social-network-design.md](docs/social-network-design.md) | Follows, networked feed, notifications (design) |
 | [docs/agent-trader-v2.md](docs/agent-trader-v2.md) | Multi-agent trader design |
+| [docs/agent-trader-v3.md](docs/agent-trader-v3.md) | Plan: web research (no Finnhub) |
+| [docs/agent-trader-v4.md](docs/agent-trader-v4.md) | Plan: paper portfolio P&L |
 
 Coding agents start at [`AGENTS.md`](AGENTS.md).
 
 ## Design notes
 
-The UI follows a deliberate direction documented in [docs/frontend.md](docs/frontend.md):
+The UI follows a deliberate direction documented in [docs/frontend-ui-guide.md](docs/frontend-ui-guide.md):
 warm paper background, ink text, a single deep market-green accent, **Fraunces** display
 serif with **Instrument Sans** body type, and monospaced tickers. No purple gradient
 SaaS clones, no `alert()` dialogs, no component-library dumps.
