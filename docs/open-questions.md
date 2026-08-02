@@ -79,9 +79,9 @@ Legend: **P1** = helps polished FE · **P2** = can wait
 
 ### Q4. Feed model — **P1**
 Global public / following graph / hybrid?  
-**Working assumption:** global public feed; honor private accounts when implemented.
+**Working assumption (proposed in [social-network.md](./social-network.md)):** **hybrid** — Home has **Following** (accepted followees + self) and **Discover** (global public). One-way follows; **private accounts use follow requests** (accept/decline).
 
-**Your answer:** _TBD_
+**Answered:** Hybrid Following + Discover; private accounts use follow requests (see [social-network.md](./social-network.md)).
 
 ### Q5. Who runs/sees the LLM agent? — **P1**
 Shared house agent / per-user / admin-only?  

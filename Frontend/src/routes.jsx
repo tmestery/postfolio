@@ -7,6 +7,9 @@ import SignupPage from './pages/signup'
 import NewPostPage from './pages/newpost'
 import AgentPage from './pages/agent'
 import AccountPage from './pages/account'
+import ProfilePage from './pages/profile'
+import PeoplePage from './pages/people'
+import NotificationsPage from './pages/notifications'
 import NotFoundPage from './pages/notfound'
 
 function RequireAuth({ children }) {
@@ -22,11 +25,28 @@ export default function Routes() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/u/:username" element={<ProfilePage />} />
           <Route
             path="/post/new"
             element={
               <RequireAuth>
                 <NewPostPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/people"
+            element={
+              <RequireAuth>
+                <PeoplePage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <RequireAuth>
+                <NotificationsPage />
               </RequireAuth>
             }
           />

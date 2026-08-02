@@ -68,11 +68,12 @@ export default function SignupPage() {
   }
 
   return (
-    <section className="mx-auto max-w-sm py-10">
-      <h1 className="font-display text-3xl font-semibold text-ink">Create your account</h1>
+    <section className="mx-auto max-w-sm overflow-hidden rounded-2xl border border-line bg-surface px-5 py-7 shadow-[0_1px_0_rgba(20,24,22,0.04)] sm:px-6">
+      <p className="font-display text-2xl font-semibold text-ink">Postfolio</p>
+      <h1 className="mt-3 font-display text-xl font-semibold text-ink">Create your account</h1>
       <p className="mt-1 text-sm text-muted">Start sharing your trades in under a minute.</p>
 
-      <form onSubmit={handleSubmit} noValidate className="mt-8 flex flex-col gap-4">
+      <form onSubmit={handleSubmit} noValidate className="mt-6 flex flex-col gap-4">
         <Field
           label="Username"
           id="username"

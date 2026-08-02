@@ -178,7 +178,8 @@
 
 - Native mobile apps  
 - GraphQL usage  
-- Follows/comments/likes until feed + auth solid  
+- Comments/likes until networking track ships ([social-network.md](./social-network.md))
+- **Next major track after agent v2:** follows + networked feed + notifications — see [social-network.md](./social-network.md)  
 - Real brokerage execution  
 - JWT / Spring session (demo uses localStorage)  
 

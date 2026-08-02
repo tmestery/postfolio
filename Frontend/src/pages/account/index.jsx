@@ -48,10 +48,10 @@ export default function AccountPage() {
   }
 
   return (
-    <section className="mx-auto max-w-sm py-10">
-      <h1 className="font-display text-3xl font-semibold text-ink">Account</h1>
+    <section className="overflow-hidden rounded-2xl border border-line bg-surface px-5 py-6 shadow-[0_1px_0_rgba(20,24,22,0.04)] sm:px-6">
+      <h1 className="font-display text-2xl font-semibold text-ink">Profile</h1>
       <p className="mt-1 text-sm text-muted">
-        Signed in as <span className="font-medium text-ink">{user.username}</span>
+        Signed in as <span className="font-medium text-ink">@{user.username}</span>
       </p>
 
       <div className="mt-8 border-t border-line pt-6">

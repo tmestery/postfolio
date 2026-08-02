@@ -7,6 +7,7 @@ Start here depending on the job:
 | **[frontend.md](./frontend.md)** | **Required before any UI work** — structure, design rules, auth UX, anti-patterns |
 | **[open-questions.md](./open-questions.md)** | **Locked decisions** + remaining open questions |
 | **[agent-trader-v2.md](./agent-trader-v2.md)** | **Deep multi-agent trader redesign** (Groq, debate, capital committee) |
+| **[social-network.md](./social-network.md)** | **Follows, networked feed, profiles, notifications** (design) |
 | [plan.md](./plan.md) | Ranked roadmap — vertical slices with done criteria |
 | [architecture.md](./architecture.md) | System overview (web app, API, LLM agent) |
 | [api.md](./api.md) | HTTP contracts, status codes, FE parsing traps |

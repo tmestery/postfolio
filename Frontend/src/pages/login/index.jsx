@@ -28,8 +28,9 @@ export default function LoginPage() {
   }
 
   return (
-    <section className="mx-auto max-w-sm py-10">
-      <h1 className="font-display text-3xl font-semibold text-ink">Welcome back</h1>
+    <section className="mx-auto max-w-sm overflow-hidden rounded-2xl border border-line bg-surface px-5 py-7 shadow-[0_1px_0_rgba(20,24,22,0.04)] sm:px-6">
+      <p className="font-display text-2xl font-semibold text-ink">Postfolio</p>
+      <h1 className="mt-3 font-display text-xl font-semibold text-ink">Welcome back</h1>
       <p className="mt-1 text-sm text-muted">Log in to see your feed.</p>
 
       <form onSubmit={handleSubmit} noValidate className="mt-8 flex flex-col gap-4">

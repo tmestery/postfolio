@@ -10,8 +10,9 @@ Postfolio is a full-stack **web** app: React (Vite) frontend + Spring Boot REST 
 2. Skim `docs/open-questions.md` — honor **locked** decisions; do not invent answers for remaining open items (use working assumptions only).
 3. Read `docs/plan.md` for the **ranked** slice you are implementing.
 4. **Any LLM agent trader work:** read `docs/agent-trader-v2.md` (Groq deep multi-agent redesign).
-5. **Any frontend / UI / CSS / page work:** read `docs/frontend.md` fully and follow it literally (it overrides generic UI habits).
-6. **Any API wiring:** read `docs/api.md`.
+5. **Any follows / feed graph / notifications work:** read `docs/social-network.md` first; do not implement until that design is approved.
+6. **Any frontend / UI / CSS / page work:** read `docs/frontend.md` fully and follow it literally (it overrides generic UI habits).
+7. **Any API wiring:** read `docs/api.md`.
 7. Load matching skills from `skills/` or `.cursor/skills/`.
 
 ## Locked demo decisions (summary)

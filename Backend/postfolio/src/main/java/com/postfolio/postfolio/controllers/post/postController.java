@@ -95,13 +95,26 @@ public class postController {
     }
 
     /**
-     * GET http://localhost:8080/post/feed/
+     * GET http://localhost:8080/post/feed/?username=me&mode=following|discover
      *
-     * @return 200 + newest-first posts from public accounts
+     * following = accepted followees + self; discover = public accounts (default).
      */
     @GetMapping("/feed/")
-    public List<Post> feed() {
-        return postService.getFeed();
+    public ResponseEntity<?> feed(@RequestParam(required = false) String username,
+                                  @RequestParam(required = false, defaultValue = "discover") String mode) {
+        if ("following".equalsIgnoreCase(mode)) {
+            if (username == null || username.isBlank()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "username is required for following feed"));
+            }
+            Optional<WebUser> viewer = userRepository.findByUsername(username);
+            if (viewer.isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "unknown user: " + username));
+            }
+            return ResponseEntity.ok(postService.getFollowingFeed(viewer.get()));
+        }
+        return ResponseEntity.ok(postService.getDiscoverFeed());
     }
 
     /**

@@ -276,11 +276,11 @@ export default function AgentPage() {
   const running = status === 'running'
 
   return (
-    <section className="py-4">
-      <h1 className="font-display text-3xl font-semibold text-ink">Agent trader</h1>
+    <section className="overflow-hidden rounded-2xl border border-line bg-surface px-5 py-6 shadow-[0_1px_0_rgba(20,24,22,0.04)] sm:px-6">
+      <h1 className="font-display text-2xl font-semibold text-ink">Agent desk</h1>
       <p className="mt-2 max-w-lg text-sm text-muted">
-        A deep multi-agent desk on Groq: news scout, bull/bear debate, stock judge, then a capital
-        committee (aggressive / balanced / defensive + cash guard) that sizes a $1,000 simulated book.
+        News scout, bull/bear debate, stock judge, then a capital committee that sizes a $1,000
+        simulated book — with a full decision trace.
       </p>
 
       <div className="mt-6 flex gap-3">

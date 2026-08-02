@@ -183,6 +183,8 @@ postfolio/
 | [docs/setup.md](docs/setup.md) | Running locally / troubleshooting |
 | [docs/plan.md](docs/plan.md) | Roadmap and what shipped |
 | [docs/open-questions.md](docs/open-questions.md) | Locked decisions + open product questions |
+| [docs/social-network.md](docs/social-network.md) | Follows, networked feed, notifications (design) |
+| [docs/agent-trader-v2.md](docs/agent-trader-v2.md) | Multi-agent trader design |
 
 Coding agents start at [`AGENTS.md`](AGENTS.md).
 
