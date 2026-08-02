@@ -12,6 +12,8 @@ import com.postfolio.postfolio.stockInvestmentAgents.execute.TradeExecutor;
 import com.postfolio.postfolio.stockInvestmentAgents.groq.GroqConfig;
 import com.postfolio.postfolio.stockInvestmentAgents.model.Candidate;
 import com.postfolio.postfolio.stockInvestmentAgents.model.RunResult;
+import com.postfolio.postfolio.stockInvestmentAgents.portfolio.PortfolioService;
+import com.postfolio.postfolio.stockInvestmentAgents.portfolio.PortfolioSnapshot;
 import com.postfolio.postfolio.stockInvestmentAgents.research.ResearchSupervisor;
 import org.springframework.stereotype.Service;
 
@@ -36,12 +38,14 @@ public class RunSupervisor {
     private final CapitalSupervisor capital;
     private final TradeExecutor executor;
     private final AgentRunRepository runRepository;
+    private final PortfolioService portfolioService;
     private final ObjectMapper mapper = new ObjectMapper();
 
     public RunSupervisor(GroqConfig config, ResearchSupervisor research,
                          BullAgent bull, BearAgent bear, StockJudgeAgent stockJudge,
                          CapitalSupervisor capital, TradeExecutor executor,
-                         AgentRunRepository runRepository) {
+                         AgentRunRepository runRepository,
+                         PortfolioService portfolioService) {
         this.config = config;
         this.research = research;
         this.bull = bull;
@@ -50,6 +54,7 @@ public class RunSupervisor {
         this.capital = capital;
         this.executor = executor;
         this.runRepository = runRepository;
+        this.portfolioService = portfolioService;
     }
 
     /**
@@ -61,9 +66,23 @@ public class RunSupervisor {
         RunResult result = new RunResult();
         result.runId = UUID.randomUUID().toString();
         result.status = "completed";
-        result.startingAllowance = config.getAllowance();
-        result.cashReserveTarget = round2(config.getAllowance() * config.getCashReservePct());
-        result.remainingAllowance = result.startingAllowance;
+        if (execute) {
+            double houseCash = portfolioService.getOrCreate().getCash();
+            result.startingAllowance = houseCash;
+            result.cashReserveTarget = round2(config.getAllowance() * config.getCashReservePct());
+            result.remainingAllowance = houseCash;
+            if (houseCash <= result.cashReserveTarget) {
+                result.addTrace("supervisor", "stopped",
+                        "House cash at or below the $%.0f reserve floor".formatted(result.cashReserveTarget),
+                        Map.of("cash", houseCash));
+                result.portfolio = portfolioService.snapshot().toSummary();
+                return persist(result, username);
+            }
+        } else {
+            result.startingAllowance = config.getAllowance();
+            result.cashReserveTarget = round2(config.getAllowance() * config.getCashReservePct());
+            result.remainingAllowance = result.startingAllowance;
+        }
 
         try {
             List<String> headlines = research.gatherEvidence(result);
@@ -116,6 +135,9 @@ public class RunSupervisor {
 
             if (execute) {
                 executor.execute(result, result.quoteSnapshot);
+                PortfolioSnapshot book = portfolioService.applyFills(result.executedTrades);
+                result.portfolio = book.toSummary();
+                result.remainingAllowance = book.cash;
             } else {
                 result.addTrace("supervisor", "ok", "Research run — paper book only, no fills", Map.of());
             }

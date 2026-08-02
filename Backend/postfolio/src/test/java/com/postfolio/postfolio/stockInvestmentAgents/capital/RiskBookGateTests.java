@@ -1,5 +1,6 @@
 package com.postfolio.postfolio.stockInvestmentAgents.capital;
 
+import com.postfolio.postfolio.stockInvestmentAgents.groq.GroqConfig;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedHashMap;
@@ -11,7 +12,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RiskBookGateTests {
 
-    private final RiskBookGate gate = new RiskBookGate();
+    private static final GroqConfig CONFIG =
+            new GroqConfig("key", "fast", "judge", 1000, 0.15, 60000);
+
+    private final RiskBookGate gate = new RiskBookGate(CONFIG);
 
     // Positive: a compliant book passes untouched with no violations.
     @Test

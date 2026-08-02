@@ -12,6 +12,9 @@ import com.postfolio.postfolio.stockInvestmentAgents.groq.GroqConfig;
 import com.postfolio.postfolio.stockInvestmentAgents.model.Candidate;
 import com.postfolio.postfolio.stockInvestmentAgents.model.RunResult;
 import com.postfolio.postfolio.stockInvestmentAgents.model.TraceStep;
+import com.postfolio.postfolio.stockInvestmentAgents.portfolio.PortfolioService;
+import com.postfolio.postfolio.stockInvestmentAgents.portfolio.PortfolioSnapshot;
+import com.postfolio.postfolio.models.portfolio.AgentPortfolio;
 import com.postfolio.postfolio.stockInvestmentAgents.research.ResearchSupervisor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,11 +42,12 @@ class RunSupervisorTests {
     private StockJudgeAgent judge;
     private CapitalSupervisor capital;
     private AgentRunRepository runRepository;
+    private PortfolioService portfolioService;
 
     private RunSupervisor supervisor(long timeoutMs) {
         GroqConfig config = new GroqConfig("key", "fast", "judge", 1000, 0.15, timeoutMs);
         return new RunSupervisor(config, research, bull, bear, judge,
-                capital, new TradeExecutor(), runRepository);
+                capital, new TradeExecutor(), runRepository, portfolioService);
     }
 
     @BeforeEach
@@ -54,6 +58,20 @@ class RunSupervisorTests {
         judge = mock(StockJudgeAgent.class);
         capital = mock(CapitalSupervisor.class);
         runRepository = mock(AgentRunRepository.class);
+        portfolioService = mock(PortfolioService.class);
+        AgentPortfolio book = new AgentPortfolio();
+        book.setCash(1000);
+        book.setStartingCash(1000);
+        when(portfolioService.getOrCreate()).thenReturn(book);
+        when(portfolioService.applyFills(any())).thenAnswer(inv -> {
+            PortfolioSnapshot snap = new PortfolioSnapshot();
+            snap.cash = 760.0;
+            snap.startingCashSeed = 1000;
+            snap.equity = 760.0;
+            snap.totalPnl = -240.0;
+            return snap;
+        });
+        when(portfolioService.snapshot()).thenReturn(new PortfolioSnapshot());
     }
 
     private void stubHappyPath() {

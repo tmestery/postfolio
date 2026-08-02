@@ -35,6 +35,8 @@ public class RunResult {
     public Map<String, Integer> plannedShares = new LinkedHashMap<>();
     /** Fills ({ ticker → { shares, price, cost } }); empty on research-only runs. */
     public Map<String, Map<String, Double>> executedTrades = new LinkedHashMap<>();
+    /** House book summary after execute (docs/agent-trader-v4.md). */
+    public Map<String, Object> portfolio = new LinkedHashMap<>();
 
     public List<TraceStep> agentTrace = new ArrayList<>();
 

@@ -2,11 +2,16 @@ import { useEffect, useRef, useState } from 'react'
 import {
   executeAgentTrades,
   getAgentRun,
+  getPortfolio,
+  getPortfolioHistory,
   listAgentRuns,
+  refreshPortfolio,
+  resetPortfolio,
   runAgentResearch,
 } from '../../api/trades'
 import { useAuth } from '../../auth/useAuth'
 import { agentMeta, buildPipelineView } from './pipeline'
+import { PortfolioPanel } from './portfolio-panel'
 
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
 
@@ -416,7 +421,65 @@ export default function AgentPage() {
   const [history, setHistory] = useState([])
   const [loadingHistoryId, setLoadingHistoryId] = useState(null)
   const [liveTrace, setLiveTrace] = useState([])
+  const [portfolio, setPortfolio] = useState(null)
+  const [portfolioHistory, setPortfolioHistory] = useState([])
+  const [refreshingPortfolio, setRefreshingPortfolio] = useState(false)
   const activeRun = useRef(0)
+
+  async function loadPortfolio() {
+    try {
+      const [snap, points] = await Promise.all([getPortfolio(), getPortfolioHistory()])
+      setPortfolio(snap)
+      setPortfolioHistory(points)
+    } catch {
+      /* scoreboard optional when API unavailable */
+    }
+  }
+
+  useEffect(() => {
+    loadPortfolio()
+  }, [])
+
+  useEffect(() => {
+    if (document.visibilityState !== 'visible') return undefined
+    const interval = setInterval(() => {
+      if (document.visibilityState !== 'visible') return
+      refreshPortfolio()
+        .then((snap) => {
+          setPortfolio(snap)
+          return getPortfolioHistory()
+        })
+        .then(setPortfolioHistory)
+        .catch(() => {})
+    }, 30_000)
+    return () => clearInterval(interval)
+  }, [])
+
+  async function handleRefreshPortfolio() {
+    setRefreshingPortfolio(true)
+    try {
+      const snap = await refreshPortfolio()
+      setPortfolio(snap)
+      const points = await getPortfolioHistory()
+      setPortfolioHistory(points)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setRefreshingPortfolio(false)
+    }
+  }
+
+  async function handleResetPortfolio() {
+    if (!window.confirm('Reset the house book to the starting cash seed?')) return
+    try {
+      const snap = await resetPortfolio()
+      setPortfolio(snap)
+      const points = await getPortfolioHistory()
+      setPortfolioHistory(points)
+    } catch (err) {
+      setError(err.message)
+    }
+  }
 
   useEffect(() => {
     listAgentRuns()
@@ -470,6 +533,10 @@ export default function AgentPage() {
       }
       setResult(data)
       setStatus('done')
+      if (data?.portfolio) {
+        setPortfolio((prev) => ({ ...prev, ...data.portfolio, equity: data.portfolio.equity }))
+      }
+      loadPortfolio()
     } catch (err) {
       if (activeRun.current !== runId) return
       setError(err.message)
@@ -524,6 +591,14 @@ export default function AgentPage() {
         </div>
       </div>
 
+      <PortfolioPanel
+        portfolio={portfolio}
+        history={portfolioHistory}
+        refreshing={refreshingPortfolio}
+        onRefresh={handleRefreshPortfolio}
+        onReset={handleResetPortfolio}
+      />
+
       <div className="mt-5">
         <DeskWindow
           status={status}
@@ -537,8 +612,10 @@ export default function AgentPage() {
 
       {status === 'idle' && (
         <p className="mt-3 text-xs text-muted">
-          Needs <code className="font-mono">GROQ_API_KEY</code>. Scrapes public news feeds and Yahoo
-          quotes — see <code className="font-mono">docs/agent-trader-v3.md</code>.
+          Needs <code className="font-mono">GROQ_API_KEY</code> for the agent and{' '}
+          <code className="font-mono">ALPACA_API_KEY_ID</code> /{' '}
+          <code className="font-mono">ALPACA_API_SECRET_KEY</code> for live P&L marks (simulated
+          trades only — no real money).
         </p>
       )}
 

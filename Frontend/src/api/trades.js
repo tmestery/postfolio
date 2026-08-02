@@ -25,3 +25,28 @@ export async function getAgentRun(runId) {
   const { data } = await apiFetch(`/trade/runs/${encodeURIComponent(runId)}/`)
   return data && typeof data === 'object' ? data : {}
 }
+
+/** House paper portfolio snapshot (docs/agent-trader-v4.md). */
+export async function getPortfolio() {
+  const { data } = await apiFetch('/trade/portfolio/')
+  return data && typeof data === 'object' ? data : {}
+}
+
+export async function refreshPortfolio() {
+  try {
+    const { data } = await apiFetch('/trade/portfolio/refresh/', { method: 'POST' })
+    return data && typeof data === 'object' ? data : {}
+  } catch (err) {
+    throw err instanceof Error ? err : new Error('Refresh failed')
+  }
+}
+
+export async function resetPortfolio() {
+  const { data } = await apiFetch('/trade/portfolio/reset/', { method: 'POST' })
+  return data && typeof data === 'object' ? data : {}
+}
+
+export async function getPortfolioHistory() {
+  const { data } = await apiFetch('/trade/portfolio/history/')
+  return data?.points && Array.isArray(data.points) ? data.points : []
+}

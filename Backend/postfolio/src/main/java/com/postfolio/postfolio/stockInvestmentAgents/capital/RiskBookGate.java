@@ -1,5 +1,6 @@
 package com.postfolio.postfolio.stockInvestmentAgents.capital;
 
+import com.postfolio.postfolio.stockInvestmentAgents.groq.GroqConfig;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,6 +23,12 @@ public class RiskBookGate {
     static final double MAX_SINGLE_NAME_WEIGHT = 0.35;
     static final Pattern TICKER = Pattern.compile("^[A-Z]{1,5}$");
 
+    private final GroqConfig config;
+
+    public RiskBookGate(GroqConfig config) {
+        this.config = config;
+    }
+
     public record GateResult(Map<String, Integer> approvedShares,
                              List<String> violations,
                              List<Map<String, Object>> adjustments) {}
@@ -29,7 +36,7 @@ public class RiskBookGate {
     public GateResult check(Map<String, Integer> proposedShares, Map<String, Double> quotes,
                             double startingAllowance, double reserveTarget) {
         double maxSpend = startingAllowance - reserveTarget;
-        double maxPerName = startingAllowance * MAX_SINGLE_NAME_WEIGHT;
+        double maxPerName = config.getAllowance() * MAX_SINGLE_NAME_WEIGHT;
         List<String> violations = new ArrayList<>();
         List<Map<String, Object>> adjustments = new ArrayList<>();
         Map<String, Integer> book = new LinkedHashMap<>();
