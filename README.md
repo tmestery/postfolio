@@ -34,26 +34,6 @@ and follow an LLM agent trader that reads market news and simulates its own pick
 
 ## Architecture
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│  Browser — React 19 + Vite 7 + Tailwind 4                    │
-│  /  /login  /signup  /post/new  /agent  /account  (+404)     │
-│  session: localStorage["postfolio.session"]                  │
-└─────────────────────────────┬────────────────────────────────┘
-                              │ JSON over HTTP
-                              │ CORS: localhost:5173 → :8080
-┌─────────────────────────────▼────────────────────────────────┐
-│  Spring Boot 4 (Java 21)                                     │
-│  controllers → services → Spring Data JPA                    │
-│  BCrypt passwords · username demo bridge · owner checks      │
-└──────┬────────────────────┬─────────────────────┬────────────┘
-       │                    │                     │
-       ▼                    ▼                     ▼
-  PostgreSQL           Public web            Groq API
-  users + posts        news RSS + Yahoo      chat completions
-  + agent_run
-```
-
 ### The agent pipeline, step by step
 
 1. **Research crew** — Source Planner → Web Scouts → Evidence Packer
@@ -66,19 +46,6 @@ and follow an LLM agent trader that reads market news and simulates its own pick
 
 Every dependency failure (missing Groq key, empty research pack, provider down) returns a
 structured `503 + {"error": "..."}` that the UI surfaces verbatim. Details: [docs/agent-trader-v2.md](docs/agent-trader-v2.md).
-
-## Feature checklist
-
-- [x] Signup with validation — `201`, duplicate username/email → `409`, passwords BCrypt-hashed and never serialized
-- [x] Login (`202` + username), auto-login after signup, session survives refresh
-- [x] Protected routes: `/post/new`, `/agent`, `/account` redirect guests to login
-- [x] Feed with loading / error / empty states, public-accounts-only filtering
-- [x] Ticker search (uppercase-normalized) and two-step inline owner delete — no `alert()`
-- [x] Create post with field validation; server computes price/share
-- [x] Agent page with trace timeline, capital committee panel, fills, and recent-run history
-- [x] Account privacy toggle that immediately hides/shows your posts in the feed
-- [x] 404 route, custom design tokens (Fraunces + Instrument Sans, warm paper + market green)
-- [x] Automated tests (backend MockMvc/unit · frontend Vitest) and CI
 
 ## Quick start
 
@@ -121,23 +88,6 @@ npm run dev
 </details>
 
 Full walkthrough and smoke-test curls: [docs/local-development.md](docs/local-development.md). Keys live in root [`.env.example`](.env.example).
-
-## API at a glance
-
-| Endpoint | Method | Success | Failure |
-|----------|--------|---------|---------|
-| `/credentials/signup/` | POST | `201` + user | `400` missing fields · `409` duplicate |
-| `/credentials/login/` | POST | `202` + username (plain text) | `400` |
-| `/post/feed/` | GET | `200` + posts (public accounts, newest first) | — |
-| `/post/stock/` | POST | `201` + post | `400` validation / unknown user |
-| `/post/stock/search/?stockName=` | POST | `200` + posts (may be `[]`) | — |
-| `/post/delete/?postId=&username=` | POST | `204` | `400` / `403` not owner / `404` |
-| `/account/status/` | GET / POST | `200` + visibility | `400` / `404` |
-| `/trade/stock/test/` | GET | `200` + `RunResult` (paper book + trace) | `503` + `{error}` |
-| `/trade/stock/execute/` | GET | `200` + `RunResult` (fills + trace) | `503` + `{error}` |
-| `/trade/runs/` | GET | `200` + recent run summaries | — |
-
-Full contracts with request/response bodies: [docs/rest-api-contract.md](docs/rest-api-contract.md).
 
 ## Testing
 
@@ -192,14 +142,7 @@ postfolio/
 
 Coding agents start at [`AGENTS.md`](AGENTS.md).
 
-## Design notes
-
-The UI follows a deliberate direction documented in [docs/frontend-ui-guide.md](docs/frontend-ui-guide.md):
-warm paper background, ink text, a single deep market-green accent, **Fraunces** display
-serif with **Instrument Sans** body type, and monospaced tickers. No purple gradient
-SaaS clones, no `alert()` dialogs, no component-library dumps.
-
 ## Contributors
 
-- **Mason Hart**
 - **Tyler Mestery** — [@tmestery](https://github.com/tmestery)
+- **Mason Hart** - [@mphart](https://github.com/mphart)
